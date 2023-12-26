@@ -21,5 +21,21 @@ func Router() *gin.Engine {
 	// lustre
 	r.POST("/convert-lustre", service.ConvertLustre)
 
+	// 模拟器
+	r.POST("/next", service.Next)
+	r.GET("/get-next", service.GetNext)
+	r.POST("/reset", service.Reset)
+	r.GET("/get-trace", service.GetTrace)
+	r.POST("/save-trace", service.SaveTrace)
+	r.POST("/open-trace", service.OpenTrace)
+	r.POST("/random-trace", service.RandomTrace)
+	r.GET("/get-global", service.GetGlobal)
+	r.GET("/get-local", service.GetLocal)
+	r.GET("/get-current-status", service.GetCurrentStatus)
+	r.GET("/get-sync", service.GetSync)
+
+	// 验证器
+	r.POST("/verify", service.Verify)
+
 	return r
 }

@@ -20,3 +20,5 @@
 - ...
 - Automaton-N
 - System Declaration
+
+## Lustre和Uppaal对应的关系

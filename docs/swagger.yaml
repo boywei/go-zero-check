@@ -4,6 +4,21 @@ paths:
   /convert:
     post:
       parameters:
+      - description: json file path
+        in: formData
+        name: file
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 前端传过来的JSON转Go对象
+      tags:
+      - 转换方法
+  /convert-lustre:
+    post:
+      parameters:
       - description: file path
         in: formData
         name: file
@@ -16,4 +31,169 @@ paths:
       summary: Lustre转Uppaal
       tags:
       - Lustre方法
+  /get-current-status:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取当前状态
+      tags:
+      - 模拟器
+  /get-global:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取各自动机的局部变量(对应模拟器中间的局部变量)
+      tags:
+      - 模拟器
+  /get-next:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取使能迁移中所有可能的下一步
+      tags:
+      - 模拟器
+  /get-sync:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取同步情况(对应模拟器右下角的同步图)
+      tags:
+      - 模拟器
+  /get-trace:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取模拟Trace
+      tags:
+      - 模拟器
+  /next:
+    post:
+      parameters:
+      - description: model id
+        in: formData
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 使能迁移下一步
+      tags:
+      - 模拟器
+  /open-trace:
+    post:
+      parameters:
+      - description: trace path
+        in: formData
+        name: file
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 打开模拟Trace
+      tags:
+      - 模拟器
+  /random-trace:
+    post:
+      parameters:
+      - description: model id
+        in: formData
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 随机模拟Trace
+      tags:
+      - 模拟器
+  /reset:
+    post:
+      parameters:
+      - description: model id
+        in: formData
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 重置使能迁移, 复位
+      tags:
+      - 模拟器
+  /save-trace:
+    post:
+      parameters:
+      - description: model id
+        in: formData
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 保存模拟Trace
+      tags:
+      - 模拟器
+  /verify:
+    post:
+      parameters:
+      - description: property
+        in: formData
+        name: property
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 验证某条性质是否成立
+      tags:
+      - 验证器
 swagger: "2.0"
