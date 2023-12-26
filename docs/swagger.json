@@ -1,0 +1,32 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/convert": {
+            "post": {
+                "tags": [
+                    "Lustre方法"
+                ],
+                "summary": "Lustre转Uppaal",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "file path",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

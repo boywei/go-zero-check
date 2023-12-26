@@ -1,0 +1,19 @@
+info:
+  contact: {}
+paths:
+  /convert:
+    post:
+      parameters:
+      - description: file path
+        in: formData
+        name: file
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: Lustre转Uppaal
+      tags:
+      - Lustre方法
+swagger: "2.0"
