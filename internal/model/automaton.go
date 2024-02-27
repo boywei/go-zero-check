@@ -7,7 +7,7 @@ type Automaton struct {
 	Transitions []Transition
 	Init        Location
 
-	Declarations Declaration
+	Declaration Declaration
 }
 
 // 第一层次: 自动机的主要元素

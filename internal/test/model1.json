@@ -1,19 +1,5 @@
 {
-  "declaration": {
-    "variables": null,
-    "constants": null,
-    "clocks": null,
-    "chans": null,
-    "functions": [
-      {
-        "name": "f",
-        "parameters": [
-          "x",
-          "y"
-        ]
-      }
-    ]
-  },
+  "declaration": "package demo",
   "automatons": [
     {
       "Name": "a",
