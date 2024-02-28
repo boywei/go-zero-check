@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/boywei/go-zero-check/internal/middleware"
 	"net/http"
 	"os"
 	"strings"
@@ -42,17 +43,23 @@ func Convert(c *gin.Context) {
 		0. 在demo目录下新建一个目录: <模型名>_demo, 后续生成的模型文件都放在此目录下
 		1. 处理Declaration: 将全局的Declaration生成新的go文件: declaration.go
 		2. 处理Automatons: 将Automatons数组的每个元素生成一个新的go文件: <自动机名>.go
-		3. 处理SystemDeclaration: 执行该语句(执行方式待考量), 保存声明后的Uppaal对象(可使用缓存?)
+		3. 处理SystemDeclaration: 执行该语句(执行方式待考量)
 		4. 做好模型图中的语法检查
-		5. 在新的端口启动项目, 给出错误信息
+		5. 在新的端口启动项目, 给出错误信息; 若无则保存声明后的Uppaal对象(使用同一redis缓存！), 并返回生成的uuid字符串
 	*/
 	// 0. 新建模型目录
 	modelName := "test"
 	modelPath := "internal/demo/" + modelName + "/"
 	err = os.Mkdir(modelPath, os.ModePerm)
 	if err != nil {
-		log.Fatal("Mkdir err: ", err)
+		if os.IsExist(err) { // 当前目录已经存在
+			_ = os.Remove(modelPath)
+			_ = os.Mkdir(modelPath, os.ModePerm)
+		} else { // 其他错误
+			log.Fatal("Mkdir err: ", err)
+		}
 	}
+
 	// 1. 处理Declaration
 	df, err := os.Create(modelPath + "declaration.go")
 	defer df.Close()
@@ -88,15 +95,17 @@ func Convert(c *gin.Context) {
 			log.Fatal("Write automaton declaration err: ", err)
 		}
 	}
-	// 3. 处理SystemDeclaration: 执行该语句(执行方式待考量), 保存声明后的Uppaal对象(使用同一redis缓存！)
+	// 3. 处理SystemDeclaration: 执行该语句(执行方式待考量)
 
 	// 4. 做好模型图中的语法检查
 
-	// 5. 在新的端口启动项目, 给出错误信息
+	// 5. 在新的端口启动项目, 给出错误信息; 若无则保存声明后的Uppaal对象(使用同一redis缓存！), 并返回生成的uuid字符串
+	uuid, err := middleware.SetModel(object)
 
-	data := object
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
-		"data": data,
+		"data": map[string]string{
+			"id": uuid,
+		},
 	})
 }
