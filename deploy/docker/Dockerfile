@@ -11,6 +11,8 @@ ENV GO111MODULE=on \
     TZ=Asia/Shanghai \
     APP_ENV=docker
 
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN swag init
 RUN go build -o main
 
 EXPOSE 8080

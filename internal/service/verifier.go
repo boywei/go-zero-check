@@ -7,11 +7,11 @@ import (
 )
 
 // Verify
-// @Tags 验证器
-// @Summary 验证某条性质是否成立
-// @Param property formData string false "property""
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /verify [post]
+//	@Tags		验证器
+//	@Summary	验证某条性质是否成立
+//	@Param		property	formData	string	false	"property""
+//	@Success	200			{string}	json	"{"code":"200","data":""}"
+//	@Router		/verify [post]
 func Verify(c *gin.Context) {
 	property := c.PostForm("property")
 	if property == "" {

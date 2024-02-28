@@ -13,13 +13,6 @@ var (
 				Parameters: []model.Parameter{"automaton_parameter1", "automaton_parameter2"},
 			},
 		},
-		Declaration: model.Declaration{
-			Functions: []model.Function{
-				{
-					Name:       "f",
-					Parameters: []model.Parameter{"x", "y"},
-				},
-			},
-		},
+		Declaration: "package demo",
 	}
 )

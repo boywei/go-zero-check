@@ -2,21 +2,23 @@ package service
 
 import (
 	"fmt"
-	"github.com/boywei/go-zero-check/internal/util/json"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/boywei/go-zero-check/internal/util/json"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
 )
 
 // Convert
-// @Tags 转换方法
-// @Summary 前端传过来的JSON转Go对象
-// @Param file formData string false "json file path"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /convert [post]
+//
+//	@Tags		转换方法
+//	@Summary	前端传过来的JSON转Go对象
+//	@Param		file	formData	string	false	"json file path"
+//	@Success	200		{string}	json	"{"code":"200","data":""}"
+//	@Router		/convert [post]
 func Convert(c *gin.Context) {
 	file := c.PostForm("file")
 	if file == "" {
@@ -86,7 +88,7 @@ func Convert(c *gin.Context) {
 			log.Fatal("Write automaton declaration err: ", err)
 		}
 	}
-	// 3. 处理SystemDeclaration: 执行该语句(执行方式待考量), 保存声明后的Uppaal对象(可使用缓存?)
+	// 3. 处理SystemDeclaration: 执行该语句(执行方式待考量), 保存声明后的Uppaal对象(使用同一redis缓存！)
 
 	// 4. 做好模型图中的语法检查
 

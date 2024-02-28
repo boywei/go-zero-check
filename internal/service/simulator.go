@@ -8,11 +8,11 @@ import (
 )
 
 // Next 使能迁移中的下一步
-// @Tags 模拟器
-// @Summary 使能迁移下一步
-// @Param id formData string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /next [post]
+//	@Tags		模拟器
+//	@Summary	使能迁移下一步
+//	@Param		id	formData	string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/next [post]
 func Next(c *gin.Context) {
 	id := c.PostForm("id")
 	if id == "" {
@@ -29,11 +29,11 @@ func Next(c *gin.Context) {
 }
 
 // GetNext 获取使能迁移中所有可能的下一步
-// @Tags 模拟器
-// @Summary 获取使能迁移中所有可能的下一步
-// @Param id query string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /get-next [get]
+//	@Tags		模拟器
+//	@Summary	获取使能迁移中所有可能的下一步
+//	@Param		id	query		string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/get-next [get]
 func GetNext(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -42,11 +42,11 @@ func GetNext(c *gin.Context) {
 }
 
 // Reset 重置使能迁移, 复位
-// @Tags 模拟器
-// @Summary 重置使能迁移, 复位
-// @Param id formData string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /reset [post]
+//	@Tags		模拟器
+//	@Summary	重置使能迁移, 复位
+//	@Param		id	formData	string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/reset [post]
 func Reset(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -55,11 +55,11 @@ func Reset(c *gin.Context) {
 }
 
 // GetTrace 获取模拟Trace
-// @Tags 模拟器
-// @Summary 获取模拟Trace
-// @Param id query string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /get-trace [get]
+//	@Tags		模拟器
+//	@Summary	获取模拟Trace
+//	@Param		id	query		string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/get-trace [get]
 func GetTrace(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -68,11 +68,11 @@ func GetTrace(c *gin.Context) {
 }
 
 // SaveTrace 保存模拟Trace
-// @Tags 模拟器
-// @Summary 保存模拟Trace
-// @Param id formData string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /save-trace [post]
+//	@Tags		模拟器
+//	@Summary	保存模拟Trace
+//	@Param		id	formData	string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/save-trace [post]
 func SaveTrace(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -81,11 +81,11 @@ func SaveTrace(c *gin.Context) {
 }
 
 // OpenTrace 打开模拟Trace
-// @Tags 模拟器
-// @Summary 打开模拟Trace
-// @Param file formData string false "trace path"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /open-trace [post]
+//	@Tags		模拟器
+//	@Summary	打开模拟Trace
+//	@Param		file	formData	string	false	"trace path"
+//	@Success	200		{string}	json	"{"code":"200","data":""}"
+//	@Router		/open-trace [post]
 func OpenTrace(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -94,11 +94,11 @@ func OpenTrace(c *gin.Context) {
 }
 
 // RandomTrace 随机模拟Trace
-// @Tags 模拟器
-// @Summary 随机模拟Trace
-// @Param id formData string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /random-trace [post]
+//	@Tags		模拟器
+//	@Summary	随机模拟Trace
+//	@Param		id	formData	string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/random-trace [post]
 func RandomTrace(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -107,11 +107,11 @@ func RandomTrace(c *gin.Context) {
 }
 
 // GetGlobal 获取全局变量(对应模拟器中间的全局变量)
-// @Tags 模拟器
-// @Summary 获取全局变量(对应模拟器中间的全局变量)
-// @Param id query string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /get-global [get]
+//	@Tags		模拟器
+//	@Summary	获取全局变量(对应模拟器中间的全局变量)
+//	@Param		id	query		string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/get-global [get]
 func GetGlobal(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -120,11 +120,11 @@ func GetGlobal(c *gin.Context) {
 }
 
 // GetLocal 获取各自动机的局部变量(对应模拟器中间的局部变量)
-// @Tags 模拟器
-// @Summary 获取各自动机的局部变量(对应模拟器中间的局部变量)
-// @Param id query string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /get-global [get]
+//	@Tags		模拟器
+//	@Summary	获取各自动机的局部变量(对应模拟器中间的局部变量)
+//	@Param		id	query		string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/get-global [get]
 func GetLocal(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -133,11 +133,11 @@ func GetLocal(c *gin.Context) {
 }
 
 // GetCurrentStatus 获取当前状态(对应模拟器右上角的各自动机状态图)
-// @Tags 模拟器
-// @Summary 获取当前状态
-// @Param id query string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /get-current-status [get]
+//	@Tags		模拟器
+//	@Summary	获取当前状态
+//	@Param		id	query		string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/get-current-status [get]
 func GetCurrentStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -146,11 +146,11 @@ func GetCurrentStatus(c *gin.Context) {
 }
 
 // GetSync 获取同步情况(对应模拟器右下角的同步图)
-// @Tags 模拟器
-// @Summary 获取同步情况(对应模拟器右下角的同步图)
-// @Param id query string false "model id"
-// @Success 200 {string} json "{"code":"200","data":""}"
-// @Router /get-sync [get]
+//	@Tags		模拟器
+//	@Summary	获取同步情况(对应模拟器右下角的同步图)
+//	@Param		id	query		string	false	"model id"
+//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Router		/get-sync [get]
 func GetSync(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,

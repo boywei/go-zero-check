@@ -6,8 +6,9 @@ import (
 )
 
 type Config struct {
-	Http HttpConfig `yaml:"http"`
-	Grpc GrpcConfig `yaml:"grpc"`
+	Http  HttpConfig  `yaml:"http"`
+	Grpc  GrpcConfig  `yaml:"grpc"`
+	Redis RedisConfig `yaml:"redis"`
 }
 
 type HttpConfig struct {
@@ -18,6 +19,11 @@ type HttpConfig struct {
 type GrpcConfig struct {
 	Host string `yaml:"host"`
 	Port int    `yaml:"port"`
+}
+
+type RedisConfig struct {
+	Addr     string `yaml:"addr"`
+	Password string `yaml:"password"`
 }
 
 var (

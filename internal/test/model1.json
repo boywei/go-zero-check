@@ -15,13 +15,7 @@
         "Name": "",
         "Invariant": {}
       },
-      "Declarations": {
-        "variables": null,
-        "constants": null,
-        "clocks": null,
-        "chans": null,
-        "functions": null
-      }
+      "Declaration": ""
     }
   ],
   "system_declaration": {
