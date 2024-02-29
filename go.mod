@@ -3,7 +3,6 @@ module github.com/boywei/go-zero-check
 go 1.20
 
 require (
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.4.0
 	github.com/sirupsen/logrus v1.9.3

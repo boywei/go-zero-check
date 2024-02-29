@@ -9,10 +9,10 @@ var (
 		},
 		Automatons: []model.Automaton{
 			{
-				Name:       "a",
+				Name:       "ego",
 				Parameters: []model.Parameter{"automaton_parameter1", "automaton_parameter2"},
 			},
 		},
-		Declaration: "package demo",
+		Declaration: "func add(a, b int) int { return a + b }",
 	}
 )

@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/boywei/go-zero-check/internal/model"
 	"github.com/go-redis/redis"
 	"github.com/google/uuid"
@@ -44,22 +46,32 @@ func ExistKey(key string) bool {
 func GetModelById(key string) (data *model.Uppaal, err error) {
 	res, err := RedisDb.Get(key).Result()
 	if err != nil {
-		log.Println("GET redis error:", err)
+		log.Errorln("GET redis error:", err)
 		return nil, err
 	}
 	err = json.Unmarshal([]byte(res), &data)
+	if err != nil {
+		log.Errorln("Get redis model error: ", err)
+	}
 	return data, nil
 }
 
 // SetModel 设置模型的缓存
 func SetModel(data *model.Uppaal) (key string, err error) {
-	strdata, _ := json.Marshal(data)
+	strdata, err := json.Marshal(data)
+	if err != nil {
+		log.Errorln("Json Marshal error: ", err)
+	}
 	key = uuid.NewString()
-	// 不过期
-	err = RedisDb.Set(key, strdata, 0).Err()
+	// 模型保存时间为1天
+	err = RedisDb.Set(key, strdata, time.Hour*24).Err()
 	if err != nil {
 		log.Println("SET redis ERROR:", err)
 		return "", err
 	}
 	return key, nil
+}
+
+func DeleteModelById(id string) {
+	RedisDb.Del(id)
 }

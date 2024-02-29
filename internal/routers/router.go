@@ -24,7 +24,11 @@ func Router() *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// json
-	r.POST("/convert", service.Convert)
+	model := r.Group("/model")
+	{
+		model.POST("/convert", service.Convert)
+		model.POST("/delete", service.DeleteModel)
+	}
 
 	// lustre
 	r.POST("/convert-lustre", service.ConvertLustre)

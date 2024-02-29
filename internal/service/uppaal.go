@@ -1,13 +1,15 @@
 package service
 
 import (
-	"fmt"
-	"github.com/boywei/go-zero-check/internal/middleware"
-	"net/http"
 	"os"
 	"strings"
 
+	"github.com/boywei/go-zero-check/internal/middleware"
+	"github.com/boywei/go-zero-check/internal/util/cmd"
+	"github.com/boywei/go-zero-check/internal/util/enum"
+	"github.com/boywei/go-zero-check/internal/util/global"
 	"github.com/boywei/go-zero-check/internal/util/json"
+	"github.com/boywei/go-zero-check/internal/util/response"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
@@ -19,22 +21,18 @@ import (
 //	@Summary	前端传过来的JSON转Go对象
 //	@Param		file	formData	string	false	"json file path"
 //	@Success	200		{string}	json	"{"code":"200","data":""}"
-//	@Router		/convert [post]
+//	@Router		/model/convert [post]
 func Convert(c *gin.Context) {
 	file := c.PostForm("file")
 	if file == "" {
-		c.JSON(http.StatusOK, gin.H{
-			"code": -1,
-			"msg":  "文件不能为空",
-		})
+		log.Errorln("Empty file")
+		response.Failure(c, enum.InvalidParam)
 		return
 	}
 	object, err := json.ConvertJson2Uppaal(file)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"code": -1,
-			"msg":  fmt.Sprintf("JSON decode error: %v", err),
-		})
+		log.Errorln("JSON decode error: ", err)
+		response.Failure(c, enum.InvalidParam)
 		return
 	}
 	// TODO: 处理转化后的object
@@ -53,7 +51,7 @@ func Convert(c *gin.Context) {
 	err = os.Mkdir(modelPath, os.ModePerm)
 	if err != nil {
 		if os.IsExist(err) { // 当前目录已经存在
-			_ = os.Remove(modelPath)
+			_ = os.RemoveAll(modelPath)
 			_ = os.Mkdir(modelPath, os.ModePerm)
 		} else { // 其他错误
 			log.Fatal("Mkdir err: ", err)
@@ -66,7 +64,7 @@ func Convert(c *gin.Context) {
 	if err != nil {
 		log.Fatal("Create declaration file err: ", err)
 	}
-	_, err = df.WriteString(string(object.Declaration))
+	_, err = df.WriteString("package " + modelName + "\n\n" + string(object.Declaration))
 	if err != nil {
 		log.Fatal("Write global declaration err: ", err)
 	}
@@ -81,6 +79,7 @@ func Convert(c *gin.Context) {
 		if err != nil {
 			log.Fatal("Handle automaton err: ", err)
 		}
+		builder.WriteString("package " + modelName + "\n\n")
 		// TODO
 		// 2) Parameters  []Parameter
 		// 3) Locations   []Location
@@ -100,12 +99,38 @@ func Convert(c *gin.Context) {
 	// 4. 做好模型图中的语法检查
 
 	// 5. 在新的端口启动项目, 给出错误信息; 若无则保存声明后的Uppaal对象(使用同一redis缓存！), 并返回生成的uuid字符串
-	uuid, err := middleware.SetModel(object)
+	if err = cmd.RunModel(global.Host, global.Port); err != nil {
+		log.Errorln("Model run error: ", err)
+		response.Failure(c, enum.ModelRunErr)
+		return
+	}
+	global.IncreasePort() // 新的端口启动后自增port，不然会导致后续项目端口冲突
 
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-		"data": map[string]string{
-			"id": uuid,
-		},
+	uuid, err := middleware.SetModel(object)
+	if err != nil {
+		log.Errorln("Cache set model error: ", err)
+		response.Failure(c, enum.ModelRunErr)
+		return
+	}
+
+	response.Success(c, gin.H{
+		"id":   uuid,
+		"host": global.Host,
+		"port": global.Port,
 	})
+}
+
+// Delete
+//
+//	@Tags		转换方法
+//	@Summary	删除一个模型
+//	@Param		id	query	string	true	"model's id"
+//	@Success	200		{string}	json	"{"code":"200","data":""}"
+//	@Router		/model/delete [post]
+func DeleteModel(c *gin.Context) {
+	// TODO: 删除redis的缓存、cmd的启动命令
+	id := c.Query("id")
+	middleware.DeleteModelById(id)
+	global.ModelCmdMap[id].Process.Kill()
+	delete(global.ModelCmdMap, id)
 }
