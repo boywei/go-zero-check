@@ -2,9 +2,11 @@ package middleware
 
 import (
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/boywei/go-zero-check/internal/model"
+	"github.com/boywei/go-zero-check/internal/util/global"
 	"github.com/go-redis/redis"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
@@ -72,6 +74,17 @@ func SetModel(data *model.Uppaal) (key string, err error) {
 	return key, nil
 }
 
-func DeleteModelById(id string) {
+// DeteteModelById 根据id删除对应的模型
+func DeleteModelById(id string) (err error) {
+	// 删除redis缓存
 	RedisDb.Del(id)
+	// 删除modelMap中的内容
+	model, ok := global.ModelIdMap[id]
+	if !ok {
+		log.Warnln(id, "not exists")
+		return errors.New("id not exists")
+	}
+	model.Crush()
+	delete(global.ModelIdMap, id)
+	return nil
 }

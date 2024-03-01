@@ -11,6 +11,7 @@ import (
 	"github.com/boywei/go-zero-check/internal/util/json"
 	"github.com/boywei/go-zero-check/internal/util/response"
 	log "github.com/sirupsen/logrus"
+	"github.com/traefik/yaegi/interp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -99,38 +100,48 @@ func Convert(c *gin.Context) {
 	// 4. 做好模型图中的语法检查
 
 	// 5. 在新的端口启动项目, 给出错误信息; 若无则保存声明后的Uppaal对象(使用同一redis缓存！), 并返回生成的uuid字符串
-	if err = cmd.RunModel(global.Host, global.Port); err != nil {
-		log.Errorln("Model run error: ", err)
-		response.Failure(c, enum.ModelRunErr)
-		return
-	}
-	global.IncreasePort() // 新的端口启动后自增port，不然会导致后续项目端口冲突
-
+	// 先保存id并返回新程序信息，再启动
 	uuid, err := middleware.SetModel(object)
 	if err != nil {
 		log.Errorln("Cache set model error: ", err)
 		response.Failure(c, enum.ModelRunErr)
 		return
 	}
-
+	// 保存model的一些全局信息
+	global.ModelIdMap[uuid] = &global.ModelMap{
+		Path:   modelPath,
+		Interp: interp.New(interp.Options{}),
+	}
 	response.Success(c, gin.H{
 		"id":   uuid,
 		"host": global.Host,
 		"port": global.Port,
 	})
+	// 这里需要注意：1.先自增port，再启动，不然可能阻塞导致
+	global.IncreasePort() // 新的端口启动后自增port，不然会导致后续项目端口冲突
+	go func() {
+		err = cmd.RunModel(global.Host, global.Port-1, uuid)
+	}()
+	if err != nil {
+		log.Errorln("Model run error: ", err)
+		response.Failure(c, enum.ModelRunErr)
+		return
+	}
 }
 
-// Delete
+// DeleteModel
 //
 //	@Tags		转换方法
 //	@Summary	删除一个模型
-//	@Param		id	query	string	true	"model's id"
+//	@Param		id	formData	string	true	"model's id"
 //	@Success	200		{string}	json	"{"code":"200","data":""}"
 //	@Router		/model/delete [post]
 func DeleteModel(c *gin.Context) {
-	// TODO: 删除redis的缓存、cmd的启动命令
-	id := c.Query("id")
-	middleware.DeleteModelById(id)
-	global.ModelCmdMap[id].Process.Kill()
-	delete(global.ModelCmdMap, id)
+	id := c.PostForm("id")
+	err := middleware.DeleteModelById(id)
+	if err != nil {
+		response.Failure(c, enum.ModelNotExist)
+		return
+	}
+	response.Success(c, nil)
 }
