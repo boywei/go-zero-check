@@ -15,30 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/convert": {
-            "post": {
-                "tags": [
-                    "转换方法"
-                ],
-                "summary": "前端传过来的JSON转Go对象",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "json file path",
-                        "name": "file",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/convert-lustre": {
             "post": {
                 "tags": [
@@ -176,6 +152,87 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/model/convert": {
+            "post": {
+                "tags": [
+                    "编辑器"
+                ],
+                "summary": "前端传过来的JSON转Go对象",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "json file path",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/model/delete": {
+            "post": {
+                "tags": [
+                    "编辑器"
+                ],
+                "summary": "删除一个模型",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model's id",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/model/test": {
+            "get": {
+                "tags": [
+                    "编辑器"
+                ],
+                "summary": "测试代码是否生成成功, 返回输入整数的下一个整数",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model's id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "number",
+                        "name": "num",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"3\"}",
                         "schema": {
                             "type": "string"
                         }

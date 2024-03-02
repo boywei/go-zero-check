@@ -2,69 +2,40 @@ package cmd
 
 import (
 	"errors"
-	"io/fs"
-	"os"
-	"path/filepath"
-	"strings"
-
 	"github.com/boywei/go-zero-check/internal/util/global"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/traefik/yaegi/interp"
-	"github.com/traefik/yaegi/stdlib"
-)
-
-var (
-	// TODO: 这里应该根据不同的模型创建不同的解释器，并在模型删除时销毁
-	i = interp.New(interp.Options{})
+	"reflect"
 )
 
 // RunCode 执行前端的语句
-func RunCode(id, code string) (err error) {
+func RunCode(id, code string) (*reflect.Value, error) {
 	model, ok := global.ModelIdMap[id]
 	if !ok {
 		log.Warnf("Model path of %s not exists\n", id)
-		return errors.New("model path of " + id + " not exists")
+		return nil, errors.New("model path of " + id + " not exists")
 	}
-	modelPath := model.Path
-	// TODO: 这里应该只需要执行一次
-	RunStaticCode(modelPath)
+	i := model.Interp
 	// 先导入包，不然找不到
-	i.Eval(`import "` + modelPath + `"`)
+	_, err := i.Eval(`import "./` + model.Path + `"`) // TODO: 这个路径令人疑惑
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
 	result, err := i.Eval(code)
 	if err != nil {
 		log.Printf("执行代码%s出错: %v\n", code, err)
-		return err
+		return nil, err
 	}
 	log.Println(result)
-	return nil
+	return &result, nil
 }
 
-func RunStaticCode(modelPath string) {
-
-	// 创建解释器
-	i.Use(stdlib.Symbols)
-
-	// 遍历文件夹并执行所有Go文件
-	err := filepath.Walk(modelPath, func(path string, info fs.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && strings.HasSuffix(info.Name(), ".go") {
-			content, err := os.ReadFile(path)
-			if err != nil {
-				return err
-			}
-			if _, err := i.Eval(string(content)); err != nil {
-				log.Printf("在执行文件 %s 时发生错误: %v\n", info.Name(), err)
-			}
-		}
-		return nil
-	})
-
-	if err != nil {
-		log.Println("遍历文件夹时出错:", err)
-		return
+func RunStaticCode(id string) (*reflect.Value, error) {
+	model, ok := global.ModelIdMap[id]
+	if !ok {
+		log.Warnf("Model path of %s not exists\n", id)
+		return nil, errors.New("model path of " + id + " not exists")
 	}
-
+	result, err := model.Interp.EvalPath("./" + model.Path) // TODO: 这个路径真是令人疑惑
+	return &result, err
 }

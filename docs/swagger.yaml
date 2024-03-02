@@ -1,21 +1,6 @@
 info:
   contact: {}
 paths:
-  /convert:
-    post:
-      parameters:
-      - description: json file path
-        in: formData
-        name: file
-        type: string
-      responses:
-        "200":
-          description: '{"code":"200","data":""}'
-          schema:
-            type: string
-      summary: 前端传过来的JSON转Go对象
-      tags:
-      - 转换方法
   /convert-lustre:
     post:
       parameters:
@@ -106,6 +91,58 @@ paths:
       summary: 获取模拟Trace
       tags:
       - 模拟器
+  /model/convert:
+    post:
+      parameters:
+      - description: json file path
+        in: formData
+        name: file
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 前端传过来的JSON转Go对象
+      tags:
+      - 编辑器
+  /model/delete:
+    post:
+      parameters:
+      - description: model's id
+        in: formData
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 删除一个模型
+      tags:
+      - 编辑器
+  /model/test:
+    get:
+      parameters:
+      - description: model's id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: number
+        in: query
+        name: num
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: '{"code":"200","data":"3"}'
+          schema:
+            type: string
+      summary: 测试代码是否生成成功, 返回输入整数的下一个整数
+      tags:
+      - 编辑器
   /next:
     post:
       parameters:
