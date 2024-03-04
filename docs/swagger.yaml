@@ -122,6 +122,27 @@ paths:
       summary: 删除一个模型
       tags:
       - 编辑器
+  /model/run:
+    post:
+      parameters:
+      - description: model's id
+        in: formData
+        name: id
+        required: true
+        type: string
+      - description: code
+        in: formData
+        name: code
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":"3"}'
+          schema:
+            type: string
+      summary: 运行一条语句(用于测试)
+      tags:
+      - 编辑器
   /model/test:
     get:
       parameters:

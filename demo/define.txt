@@ -1,17 +1,19 @@
-package model
+package test
 
 type Automaton struct {
 	Name        string       `json:"name"`
-	Parameters  []Parameter  `json:"parameters"`
+	Parameters  []string     `json:"parameters"`
 	Locations   []Location   `json:"locations"`
 	Transitions []Transition `json:"transitions"`
 	Init        int          `json:"init"`
 
-	Declaration  Declaration `json:"declaration"`
-	InitLocation Location    //需要解析
+	Declaration  string   `json:"declaration"`
+	InitLocation Location //需要解析
 }
 
 type Parameter string
+
+type Declaration string
 
 // 第一层次: 自动机的主要元素
 

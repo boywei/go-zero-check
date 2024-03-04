@@ -29,6 +29,7 @@ func Router() *gin.Engine {
 		model.POST("/convert", service.Convert)
 		model.POST("/delete", service.DeleteModel)
 		model.GET("/test", service.TestModel)
+		model.POST("/run", service.RunModel)
 	}
 
 	// lustre

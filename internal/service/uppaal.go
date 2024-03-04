@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/boywei/go-zero-check/internal/util/cmd"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -38,16 +39,7 @@ func Convert(c *gin.Context) {
 		response.Failure(c, enum.InvalidParam)
 		return
 	}
-	// TODO: 处理转化后的object
-	/*
-		处理步骤包括:
-		0. 在demo目录下新建一个目录: <模型名>_demo, 后续生成的模型文件都放在此目录下
-		1. 处理Declaration: 将全局的Declaration生成新的go文件: declaration.go
-		2. 处理Automatons: 将Automatons数组的每个元素生成一个新的go文件: <自动机名>.go
-		3. 处理SystemDeclaration: 执行该语句(使用interp解释器)
-		4. 做好模型图中的语法检查
-		5. 若无则保存声明后的Uppaal对象(使用同一redis缓存！), 并返回生成的uuid字符串
-	*/
+
 	// 0. 新建模型目录
 	modelName := "test"
 	modelPath := "demo/" + modelName + "/"
@@ -61,6 +53,24 @@ func Convert(c *gin.Context) {
 			response.Failure(c, enum.ModelConvertErr)
 			return
 		}
+	}
+
+	// 复制define.go文件到模型目录下
+	sourceFile, err := os.Open("demo/define.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer sourceFile.Close()
+
+	destinationFile, err := os.Create("demo/" + modelName + "/define.go")
+	if err != nil {
+		panic(err)
+	}
+	defer destinationFile.Close()
+	// 使用io.Copy复制文件
+	_, err = io.Copy(destinationFile, sourceFile)
+	if err != nil {
+		panic(err)
 	}
 
 	// 1. 处理Declaration
@@ -92,17 +102,54 @@ func Convert(c *gin.Context) {
 		}
 		builder.WriteString("package " + modelName + "\n\n")
 		// TODO
+		builder.WriteString("var (\n\t" + automaton.Name + " = &Automaton{\n")
+		builder.WriteString("\t\tName: \"" + automaton.Name + "\",")
+
 		// 2) Parameters  []Parameter
+		builder.WriteString("\t\tParameters: []string{\n")
+		for _, parameter := range automaton.Parameters {
+			builder.WriteString("\t\t\t\"" + string(parameter) + "\",\n")
+		}
+		builder.WriteString("\t\t},\n")
+
 		// 3) Locations   []Location
+		builder.WriteString("\t\tLocations: []Location{\n")
+		for _, location := range automaton.Locations {
+			builder.WriteString("\t\t\t{\n")
+			builder.WriteString("\t\t\t\tId: " + strconv.Itoa(location.Id) + ",\n")
+			builder.WriteString("\t\t\t\tName: \"" + location.Name + "\",\n")
+			builder.WriteString("\t\t\t\tInvariant: \"" + string(location.Invariant) + "\",\n")
+			builder.WriteString("\t\t\t},\n")
+		}
+		builder.WriteString("\t\t},\n")
+
 		// 4) Transitions []Transition
+		builder.WriteString("\t\tTransitions: []Transition{\n")
+		for _, transition := range automaton.Transitions {
+			builder.WriteString("\t\t\t{\n")
+			builder.WriteString("\t\t\t\tId: " + strconv.Itoa(transition.Id) + ",\n")
+			builder.WriteString("\t\t\t\tSourceId: " + strconv.Itoa(transition.SourceId) + ",\n")
+			builder.WriteString("\t\t\t\tDestinationId: " + strconv.Itoa(transition.DestinationId) + ",\n")
+			builder.WriteString("\t\t\t\tSelect: \"" + string(transition.Select) + "\",\n")
+			builder.WriteString("\t\t\t\tGuard: \"" + string(transition.Guard) + "\",\n")
+			builder.WriteString("\t\t\t\tSync: \"" + string(transition.Sync) + "\",\n")
+			builder.WriteString("\t\t\t\tUpdate: \"" + string(transition.Update) + "\",\n")
+			builder.WriteString("\t\t\t},\n")
+		}
+		builder.WriteString("\t\t},\n")
+
+		// TODO: 还得解析出source和target
 		// 5) Init        Location
+		builder.WriteString("\t\tInit: " + strconv.Itoa(automaton.Init) + ",\n")
+		builder.WriteString("\t}\n\n")
+		builder.WriteString(")\n\n")
 		// 6) Declarations Declaration
 		builder.WriteString(string(automaton.Declaration))
 
 		// 将builder的内容写入文件
 		_, err = f.WriteString(builder.String())
 		if err != nil {
-			log.Errorln("Write automaton declaration err: ", err)
+			log.Errorln("Write automaton err: ", err)
 			response.Failure(c, enum.ModelConvertErr)
 			return
 		}
@@ -187,6 +234,33 @@ func TestModel(c *gin.Context) {
 		return
 	}
 	code := model.Name + "." + fmt.Sprintf("Add(%d, 1)", value)
+	result, err := cmd.RunCode(id, code)
+	if err != nil {
+		log.Errorln("Model run error: ", err)
+		response.Failure(c, enum.ModelRunErr)
+		return
+	}
+	response.Success(c, gin.H{
+		"result": fmt.Sprintf("%v", *result), // TODO: 返回结果的形式有待考量
+	})
+}
+
+// RunModel
+//
+//	@Tags		编辑器
+//	@Summary	运行一条语句(用于测试)
+//	@Param		id	formData		string	true	"model's id"
+//	@Param		code	formData		string		true	"code"
+//	@Success	200	{string}	json	"{"code":"200","data":"3"}"
+//	@Router		/model/run [post]
+func RunModel(c *gin.Context) {
+	id := c.PostForm("id")
+	code := c.PostForm("code")
+	if id == "" || code == "" {
+		log.Errorln("Empty param")
+		response.Failure(c, enum.InvalidParam)
+		return
+	}
 	result, err := cmd.RunCode(id, code)
 	if err != nil {
 		log.Errorln("Model run error: ", err)

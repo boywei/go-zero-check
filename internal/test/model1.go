@@ -13,6 +13,6 @@ var (
 				Parameters: []model.Parameter{"automaton_parameter1", "automaton_parameter2"},
 			},
 		},
-		Declaration: "func Add(a, b int) int { return a + b }",
+		Declaration: "func Add(a, b int) int { return a + b } type Student struct{ name string } var ( cnt int = 0 )",
 	}
 )

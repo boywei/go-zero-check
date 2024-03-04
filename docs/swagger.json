@@ -197,6 +197,38 @@
                 }
             }
         },
+        "/model/run": {
+            "post": {
+                "tags": [
+                    "编辑器"
+                ],
+                "summary": "运行一条语句(用于测试)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model's id",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "code",
+                        "name": "code",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"3\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/model/test": {
             "get": {
                 "tags": [

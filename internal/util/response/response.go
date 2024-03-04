@@ -14,7 +14,7 @@ type Response struct {
 	Data    interface{} `json:"Data,omitempty"`    // 数据
 }
 
-// 响应
+// New 响应
 func New(errCode *enum.ErrCode, data interface{}) *Response {
 	return &Response{
 		Code:    errCode.Code,
