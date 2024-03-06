@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetNext 获取使能迁移中所有可能的下一步
+// Start 获取使能迁移中所有可能的下一步
 //
 //	@Tags		模拟器
 //	@Summary	获取使能迁移中所有可能的下一步
@@ -27,9 +27,9 @@ func Start(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	使能迁移下一步，根据自动机的id/transition的id/select的参数使模型步进一次，并返回步进结果和下一次可步进的自动机
-//	@Param		id	formData	string	false	"automaton's id"
+//	@Param		id		formData	string	false	"automaton's id"
 //	@Param		param	formData	string	false	"parameters of the automaton"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Success	200		{string}	json	"{"code":"200","data":""}"
 //	@Router		/simulator/step [post]
 func Step(c *gin.Context) {
 	id := c.PostForm("id")

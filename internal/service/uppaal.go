@@ -265,9 +265,9 @@ func TestModel(c *gin.Context) {
 //
 //	@Tags		编辑器
 //	@Summary	运行一条语句(用于测试)
-//	@Param		id	formData		string	true	"model's id"
-//	@Param		code	formData		string		true	"code"
-//	@Success	200	{string}	json	"{"code":"200","data":"3"}"
+//	@Param		id		formData	string	true	"model's id"
+//	@Param		code	formData	string	true	"code"
+//	@Success	200		{string}	json	"{"code":"200","data":"3"}"
 //	@Router		/model/run [post]
 func RunModel(c *gin.Context) {
 	id := c.PostForm("id")

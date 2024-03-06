@@ -16,81 +16,6 @@ paths:
       summary: Lustre转Uppaal
       tags:
       - Lustre方法
-  /get-current-status:
-    get:
-      parameters:
-      - description: model id
-        in: query
-        name: id
-        type: string
-      responses:
-        "200":
-          description: '{"code":"200","data":""}'
-          schema:
-            type: string
-      summary: 获取当前状态
-      tags:
-      - 模拟器
-  /get-global:
-    get:
-      parameters:
-      - description: model id
-        in: query
-        name: id
-        type: string
-      responses:
-        "200":
-          description: '{"code":"200","data":""}'
-          schema:
-            type: string
-      summary: 获取各自动机的局部变量(对应模拟器中间的局部变量)
-      tags:
-      - 模拟器
-  /get-next:
-    get:
-      parameters:
-      - description: model id
-        in: query
-        name: id
-        type: string
-      responses:
-        "200":
-          description: '{"code":"200","data":""}'
-          schema:
-            type: string
-      summary: 获取使能迁移中所有可能的下一步
-      tags:
-      - 模拟器
-  /get-sync:
-    get:
-      parameters:
-      - description: model id
-        in: query
-        name: id
-        type: string
-      responses:
-        "200":
-          description: '{"code":"200","data":""}'
-          schema:
-            type: string
-      summary: 获取同步情况(对应模拟器右下角的同步图)
-      tags:
-      - 模拟器
-  /get-trace:
-    get:
-      parameters:
-      - description: model id
-        in: query
-        name: id
-        type: string
-      responses:
-        "200":
-          description: '{"code":"200","data":""}'
-          schema:
-            type: string
-      summary: 获取模拟Trace
-      tags:
-      - 模拟器
   /model/convert:
     post:
       parameters:
@@ -164,11 +89,11 @@ paths:
       summary: 测试代码是否生成成功, 返回输入整数的下一个整数
       tags:
       - 编辑器
-  /next:
-    post:
+  /simulator/get-current-status:
+    get:
       parameters:
       - description: model id
-        in: formData
+        in: query
         name: id
         type: string
       responses:
@@ -176,10 +101,70 @@ paths:
           description: '{"code":"200","data":""}'
           schema:
             type: string
-      summary: 使能迁移下一步
+      summary: 获取当前状态
       tags:
       - 模拟器
-  /open-trace:
+  /simulator/get-global:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取各自动机的局部变量(对应模拟器中间的局部变量)
+      tags:
+      - 模拟器
+  /simulator/get-next:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取使能迁移中所有可能的下一步
+      tags:
+      - 模拟器
+  /simulator/get-sync:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取同步情况(对应模拟器右下角的同步图)
+      tags:
+      - 模拟器
+  /simulator/get-trace:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取模拟Trace
+      tags:
+      - 模拟器
+  /simulator/open-trace:
     post:
       parameters:
       - description: trace path
@@ -194,7 +179,7 @@ paths:
       summary: 打开模拟Trace
       tags:
       - 模拟器
-  /random-trace:
+  /simulator/random-trace:
     post:
       parameters:
       - description: model id
@@ -209,7 +194,7 @@ paths:
       summary: 随机模拟Trace
       tags:
       - 模拟器
-  /reset:
+  /simulator/reset:
     post:
       parameters:
       - description: model id
@@ -224,7 +209,7 @@ paths:
       summary: 重置使能迁移, 复位
       tags:
       - 模拟器
-  /save-trace:
+  /simulator/save-trace:
     post:
       parameters:
       - description: model id
@@ -237,6 +222,40 @@ paths:
           schema:
             type: string
       summary: 保存模拟Trace
+      tags:
+      - 模拟器
+  /simulator/start:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 获取使能迁移中所有可能的下一步
+      tags:
+      - 模拟器
+  /simulator/step:
+    post:
+      parameters:
+      - description: automaton's id
+        in: formData
+        name: id
+        type: string
+      - description: parameters of the automaton
+        in: formData
+        name: param
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: 使能迁移下一步，根据自动机的id/transition的id/select的参数使模型步进一次，并返回步进结果和下一次可步进的自动机
       tags:
       - 模拟器
   /verify:

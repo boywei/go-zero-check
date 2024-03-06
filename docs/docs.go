@@ -39,126 +39,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/get-current-status": {
-            "get": {
-                "tags": [
-                    "模拟器"
-                ],
-                "summary": "获取当前状态",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "model id",
-                        "name": "id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/get-global": {
-            "get": {
-                "tags": [
-                    "模拟器"
-                ],
-                "summary": "获取各自动机的局部变量(对应模拟器中间的局部变量)",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "model id",
-                        "name": "id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/get-next": {
-            "get": {
-                "tags": [
-                    "模拟器"
-                ],
-                "summary": "获取使能迁移中所有可能的下一步",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "model id",
-                        "name": "id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/get-sync": {
-            "get": {
-                "tags": [
-                    "模拟器"
-                ],
-                "summary": "获取同步情况(对应模拟器右下角的同步图)",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "model id",
-                        "name": "id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/get-trace": {
-            "get": {
-                "tags": [
-                    "模拟器"
-                ],
-                "summary": "获取模拟Trace",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "model id",
-                        "name": "id",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/model/convert": {
             "post": {
                 "tags": [
@@ -272,18 +152,18 @@ const docTemplate = `{
                 }
             }
         },
-        "/next": {
-            "post": {
+        "/simulator/get-current-status": {
+            "get": {
                 "tags": [
                     "模拟器"
                 ],
-                "summary": "使能迁移下一步",
+                "summary": "获取当前状态",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "model id",
                         "name": "id",
-                        "in": "formData"
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -296,7 +176,103 @@ const docTemplate = `{
                 }
             }
         },
-        "/open-trace": {
+        "/simulator/get-global": {
+            "get": {
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取各自动机的局部变量(对应模拟器中间的局部变量)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-next": {
+            "get": {
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取使能迁移中所有可能的下一步",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-sync": {
+            "get": {
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取同步情况(对应模拟器右下角的同步图)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-trace": {
+            "get": {
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取模拟Trace",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/open-trace": {
             "post": {
                 "tags": [
                     "模拟器"
@@ -320,7 +296,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/random-trace": {
+        "/simulator/random-trace": {
             "post": {
                 "tags": [
                     "模拟器"
@@ -344,7 +320,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/reset": {
+        "/simulator/reset": {
             "post": {
                 "tags": [
                     "模拟器"
@@ -368,7 +344,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/save-trace": {
+        "/simulator/save-trace": {
             "post": {
                 "tags": [
                     "模拟器"
@@ -379,6 +355,60 @@ const docTemplate = `{
                         "type": "string",
                         "description": "model id",
                         "name": "id",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/start": {
+            "get": {
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取使能迁移中所有可能的下一步",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/step": {
+            "post": {
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "使能迁移下一步，根据自动机的id/transition的id/select的参数使模型步进一次，并返回步进结果和下一次可步进的自动机",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "automaton's id",
+                        "name": "id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "parameters of the automaton",
+                        "name": "param",
                         "in": "formData"
                     }
                 ],
