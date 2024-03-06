@@ -146,7 +146,6 @@ func Convert(c *gin.Context) {
 		}
 		builder.WriteString("\t\t},\n")
 
-		// TODO: 还得解析出source和target
 		// 5) Init        Location
 		builder.WriteString("\t\tInit: " + strconv.Itoa(automaton.Init) + ",\n")
 		builder.WriteString("\t}\n\n")
@@ -162,11 +161,10 @@ func Convert(c *gin.Context) {
 			return
 		}
 	}
+
 	// 3. 处理SystemDeclaration: 执行该语句(执行方式待考量) ->
 
-	// 4. 做好模型图中的语法检查
-
-	// 5. 使用解释器运行代码, 若无报错则保存声明后的Uppaal对象(使用同一redis缓存！), 并返回生成的uuid字符串
+	// 4. 使用解释器运行代码, 若无报错则保存声明后的Uppaal对象(使用同一redis缓存！), 并返回生成的uuid字符串
 	// 先保存id并返回新程序信息，再启动
 	uuid, err := middleware.SetModel(object)
 	if err != nil {
@@ -185,10 +183,12 @@ func Convert(c *gin.Context) {
 		response.Failure(c, enum.ModelRunErr)
 		return
 	}
+
+	// TODO: 5. 解析相关source/target/init
+
 	response.Success(c, gin.H{
 		"id": uuid,
 	})
-
 }
 
 // getValue 用于获取字符串（uppaal中的条件判断语句）的默认值true
