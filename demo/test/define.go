@@ -19,9 +19,9 @@ type Declaration string
 
 type Location struct {
 	State
-	Id        int       `json:"id"`
-	Name      string    `json:"name"`
-	Invariant Invariant `json:"invariant"`
+	Id        int         `json:"id"`
+	Name      string      `json:"name"`
+	Invariant func() bool `json:"invariant"`
 }
 
 type Nail struct {
@@ -33,28 +33,18 @@ type State interface {
 }
 
 type Transition struct {
-	Id            int    `json:"id"`
-	SourceId      int    `json:"source_id"`
-	DestinationId int    `json:"destination_id"`
-	Select        Select `json:"select"`
-	Guard         Guard  `json:"guard"`
-	Sync          Sync   `json:"sync"`
-	Update        Update `json:"update"`
-	Source        State  // 需要解析
-	Destination   State  // 需要解析
+	Id            int         `json:"id"`
+	SourceId      int         `json:"source_id"`
+	DestinationId int         `json:"destination_id"`
+	Select        string      `json:"select"`
+	Guard         func() bool `json:"guard"`
+	Sync          func() bool `json:"sync"`
+	Update        func()      `json:"update"`
+	Source        State       // 需要解析
+	Destination   State       // 需要解析
 }
 
 // TODO: 第二层次: 自动机各元素上的标签
-
-type Select string
-
-type Guard string
-
-type Sync string
-
-type Update string
-
-type Invariant string
 
 type Probability struct {
 }

@@ -17,9 +17,9 @@ type Parameter string
 
 type Location struct {
 	State
-	Id        int       `json:"id"`
-	Name      string    `json:"name"`
-	Invariant Invariant `json:"invariant"`
+	Id        int    `json:"id"`
+	Name      string `json:"name"`
+	Invariant string `json:"invariant"`
 }
 
 type Nail struct {
@@ -34,25 +34,15 @@ type Transition struct {
 	Id            int    `json:"id"`
 	SourceId      int    `json:"source_id"`
 	DestinationId int    `json:"destination_id"`
-	Select        Select `json:"select"`
-	Guard         Guard  `json:"guard"`
-	Sync          Sync   `json:"sync"`
-	Update        Update `json:"update"`
+	Select        string `json:"select"`
+	Guard         string `json:"guard"`
+	Sync          string `json:"sync"`
+	Update        string `json:"update"`
 	Source        State  // 需要解析
 	Destination   State  // 需要解析
 }
 
 // TODO: 第二层次: 自动机各元素上的标签
-
-type Select string
-
-type Guard string
-
-type Sync string
-
-type Update string
-
-type Invariant string
 
 type Probability struct {
 }

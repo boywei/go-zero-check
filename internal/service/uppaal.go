@@ -2,11 +2,12 @@ package service
 
 import (
 	"fmt"
-	"github.com/boywei/go-zero-check/internal/util/cmd"
 	"io"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/boywei/go-zero-check/internal/util/cmd"
 
 	"github.com/boywei/go-zero-check/internal/middleware"
 	"github.com/boywei/go-zero-check/internal/util/enum"
@@ -40,7 +41,7 @@ func Convert(c *gin.Context) {
 		return
 	}
 
-	// 0. 新建模型目录
+	// 0. 新建模型目录, 拷贝define文件
 	modelName := "test"
 	modelPath := "demo/" + modelName + "/"
 	err = os.Mkdir(modelPath, os.ModePerm)
@@ -67,13 +68,20 @@ func Convert(c *gin.Context) {
 		panic(err)
 	}
 	defer destinationFile.Close()
+
+	// 添加包名
+	_, err = destinationFile.WriteString("package " + modelName + "\n\n")
+	if err != nil {
+		fmt.Printf("写入目标文件失败: %v\n", err)
+		return
+	}
 	// 使用io.Copy复制文件
 	_, err = io.Copy(destinationFile, sourceFile)
 	if err != nil {
 		panic(err)
 	}
 
-	// 1. 处理Declaration
+	// 1. 处理Declaration -> 生成declaration.go文件
 	df, err := os.Create(modelPath + "declaration.go")
 	defer df.Close()
 	if err != nil {
@@ -87,7 +95,7 @@ func Convert(c *gin.Context) {
 		response.Failure(c, enum.ModelConvertErr)
 		return
 	}
-	// 2. 处理Automatons
+	// 2. 处理Automatons -> 针对每个自动机，生成<automaton_name>.go文件
 	for _, automaton := range object.Automatons {
 		// 用一个builder来拼接所有的内容
 		var builder strings.Builder
@@ -101,9 +109,9 @@ func Convert(c *gin.Context) {
 			return
 		}
 		builder.WriteString("package " + modelName + "\n\n")
-		// TODO
+		// TODO 修改声明的方式，根据parameter来声明
 		builder.WriteString("var (\n\t" + automaton.Name + " = &Automaton{\n")
-		builder.WriteString("\t\tName: \"" + automaton.Name + "\",")
+		builder.WriteString("\t\tName: \"" + automaton.Name + "\",\n")
 
 		// 2) Parameters  []Parameter
 		builder.WriteString("\t\tParameters: []string{\n")
@@ -118,7 +126,7 @@ func Convert(c *gin.Context) {
 			builder.WriteString("\t\t\t{\n")
 			builder.WriteString("\t\t\t\tId: " + strconv.Itoa(location.Id) + ",\n")
 			builder.WriteString("\t\t\t\tName: \"" + location.Name + "\",\n")
-			builder.WriteString("\t\t\t\tInvariant: \"" + string(location.Invariant) + "\",\n")
+			builder.WriteString("\t\t\t\tInvariant: func() bool {\n\t\t\t\t\treturn " + getValue(location.Invariant) + "\n\t\t\t\t},\n")
 			builder.WriteString("\t\t\t},\n")
 		}
 		builder.WriteString("\t\t},\n")
@@ -130,10 +138,10 @@ func Convert(c *gin.Context) {
 			builder.WriteString("\t\t\t\tId: " + strconv.Itoa(transition.Id) + ",\n")
 			builder.WriteString("\t\t\t\tSourceId: " + strconv.Itoa(transition.SourceId) + ",\n")
 			builder.WriteString("\t\t\t\tDestinationId: " + strconv.Itoa(transition.DestinationId) + ",\n")
-			builder.WriteString("\t\t\t\tSelect: \"" + string(transition.Select) + "\",\n")
-			builder.WriteString("\t\t\t\tGuard: \"" + string(transition.Guard) + "\",\n")
-			builder.WriteString("\t\t\t\tSync: \"" + string(transition.Sync) + "\",\n")
-			builder.WriteString("\t\t\t\tUpdate: \"" + string(transition.Update) + "\",\n")
+			builder.WriteString("\t\t\t\tSelect: \"" + transition.Select + "\",\n")
+			builder.WriteString("\t\t\t\tGuard: func() bool {\n\t\t\t\t\treturn " + getValue(transition.Guard) + "\n\t\t\t\t},\n")
+			builder.WriteString("\t\t\t\tSync: func() bool {\n\t\t\t\t\treturn " + getValue(transition.Sync) + "\n\t\t\t\t},\n")
+			builder.WriteString("\t\t\t\tUpdate: func() {\n\t\t\t\t\t" + transition.Update + "\n\t\t\t\t},\n")
 			builder.WriteString("\t\t\t},\n")
 		}
 		builder.WriteString("\t\t},\n")
@@ -154,7 +162,7 @@ func Convert(c *gin.Context) {
 			return
 		}
 	}
-	// 3. 处理SystemDeclaration: 执行该语句(执行方式待考量)
+	// 3. 处理SystemDeclaration: 执行该语句(执行方式待考量) ->
 
 	// 4. 做好模型图中的语法检查
 
@@ -181,6 +189,14 @@ func Convert(c *gin.Context) {
 		"id": uuid,
 	})
 
+}
+
+// getValue 用于获取字符串（uppaal中的条件判断语句）的默认值true
+func getValue(data string) string {
+	if data == "" {
+		return "true"
+	}
+	return data
 }
 
 // DeleteModel

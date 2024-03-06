@@ -2,7 +2,8 @@ package test
 
 var (
 	ego = &Automaton{
-		Name: "ego",		Parameters: []string{
+		Name: "ego",
+		Parameters: []string{
 			"automaton_parameter1",
 			"automaton_parameter2",
 		},
@@ -10,12 +11,16 @@ var (
 			{
 				Id: 1,
 				Name: "start",
-				Invariant: "",
+				Invariant: func() bool {
+					return true
+				},
 			},
 			{
 				Id: 2,
 				Name: "end",
-				Invariant: "",
+				Invariant: func() bool {
+					return true
+				},
 			},
 		},
 		Transitions: []Transition{
@@ -24,18 +29,30 @@ var (
 				SourceId: 1,
 				DestinationId: 0,
 				Select: "",
-				Guard: "clock >= 0",
-				Sync: "",
-				Update: "decrease()",
+				Guard: func() bool {
+					return clock >= 0
+				},
+				Sync: func() bool {
+					return true
+				},
+				Update: func() {
+					decrease()
+				},
 			},
 			{
 				Id: 2,
 				SourceId: 2,
 				DestinationId: 0,
 				Select: "",
-				Guard: "clock < 0",
-				Sync: "",
-				Update: "clock += 1",
+				Guard: func() bool {
+					return clock < 0
+				},
+				Sync: func() bool {
+					return true
+				},
+				Update: func() {
+					clock += 1
+				},
 			},
 		},
 		Init: 1,
