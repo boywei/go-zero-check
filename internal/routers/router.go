@@ -36,17 +36,21 @@ func Router() *gin.Engine {
 	r.POST("/convert-lustre", service.ConvertLustre)
 
 	// 模拟器
-	r.POST("/next", service.Next)
-	r.GET("/get-next", service.GetNext)
-	r.POST("/reset", service.Reset)
-	r.GET("/get-trace", service.GetTrace)
-	r.POST("/save-trace", service.SaveTrace)
-	r.POST("/open-trace", service.OpenTrace)
-	r.POST("/random-trace", service.RandomTrace)
-	r.GET("/get-global", service.GetGlobal)
-	r.GET("/get-local", service.GetLocal)
-	r.GET("/get-current-status", service.GetCurrentStatus)
-	r.GET("/get-sync", service.GetSync)
+	simulator := r.Group("/simulator")
+	{
+		simulator.GET("/start", service.Start)
+		simulator.POST("/step", service.Step)
+		simulator.GET("/get-next", service.GetNext)
+		simulator.POST("/reset", service.Reset)
+		simulator.GET("/get-trace", service.GetTrace)
+		simulator.POST("/save-trace", service.SaveTrace)
+		simulator.POST("/open-trace", service.OpenTrace)
+		simulator.POST("/random-trace", service.RandomTrace)
+		simulator.GET("/get-global", service.GetGlobal)
+		simulator.GET("/get-local", service.GetLocal)
+		simulator.GET("/get-current-status", service.GetCurrentStatus)
+		simulator.GET("/get-sync", service.GetSync)
+	}
 
 	// 验证器
 	r.POST("/verify", service.Verify)
