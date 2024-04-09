@@ -3,6 +3,8 @@ module github.com/boywei/go-zero-check
 go 1.20
 
 require (
+	github.com/antlr4-go/antlr v0.0.0-20230518091524-98b52378c522
+	github.com/antlr4-go/antlr/v4 v4.13.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.4.0
 	github.com/sirupsen/logrus v1.9.3

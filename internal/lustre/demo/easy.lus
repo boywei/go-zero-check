@@ -1,0 +1,4 @@
+node Multiply(x: real; y: real) returns (z: real);
+let
+    z = x * y;
+tel
