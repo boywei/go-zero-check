@@ -62,14 +62,14 @@ func Router() *gin.Engine {
 	return r
 }
 
-// 404
+// HandleNotFound 404
 func HandleNotFound(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{
 		"msg": "not found",
 	})
 }
 
-// 500
+// Recover 500
 func Recover(c *gin.Context) {
 	defer func() {
 		if r := recover(); r != nil {

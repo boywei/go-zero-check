@@ -3,19 +3,18 @@ package response
 import (
 	"net/http"
 
-	"github.com/boywei/go-zero-check/internal/util/enum"
 	"github.com/gin-gonic/gin"
 )
 
 // Response 响应
 type Response struct {
-	Code    int         `json:"Code,omitempty"`    // 错误码
-	Message string      `json:"Message,omitempty"` // 消息
-	Data    interface{} `json:"Data,omitempty"`    // 数据
+	Code    int         `json:"code,omitempty" example:"200"`                     // 错误码
+	Message string      `json:"message,omitempty" example:"SUCCESS"`              // 消息
+	Data    interface{} `json:"data,omitempty" swaggertype:"string" example:"{}"` // 数据
 }
 
 // New 响应
-func New(errCode *enum.ErrCode, data interface{}) *Response {
+func New(errCode *ErrCode, data interface{}) *Response {
 	return &Response{
 		Code:    errCode.Code,
 		Message: errCode.Message,
@@ -25,10 +24,10 @@ func New(errCode *enum.ErrCode, data interface{}) *Response {
 
 // Success 请求成功
 func Success(c *gin.Context, data interface{}) {
-	c.JSON(http.StatusOK, New(enum.Success, data))
+	c.JSON(http.StatusOK, New(SuccessResp, data))
 }
 
 // Failure 请求失败
-func Failure(c *gin.Context, errCode *enum.ErrCode) {
+func Failure(c *gin.Context, errCode *ErrCode) {
 	c.JSON(http.StatusBadRequest, errCode)
 }

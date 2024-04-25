@@ -1,3 +1,30 @@
+definitions:
+  response.ErrCode:
+    properties:
+      code:
+        description: 错误码
+        example: 400
+        type: integer
+      message:
+        description: 消息
+        example: FAILURE
+        type: string
+    type: object
+  response.Response:
+    properties:
+      code:
+        description: 错误码
+        example: 200
+        type: integer
+      data:
+        description: 数据
+        example: '{}'
+        type: string
+      message:
+        description: 消息
+        example: SUCCESS
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -5,60 +32,94 @@ paths:
     post:
       parameters:
       - description: file content
-        in: formData
+        in: body
         name: file
-        type: string
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: SynLong数据流验证
       tags:
+      - Main
       - SynLong方法
   /lustre/convert:
     post:
       parameters:
       - description: file content
-        in: formData
+        in: body
         name: file
-        type: string
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
-      summary: SynLong转JSON
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: SynLong状态机转JSON
       tags:
+      - Main
       - SynLong方法
   /model/convert:
     post:
       parameters:
-      - description: json file path
-        in: formData
+      - description: JSON file
+        in: body
         name: file
-        type: string
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 前端传过来的JSON转Go对象
       tags:
       - 编辑器
+      - Main
   /model/delete:
     post:
       parameters:
       - description: model's id
-        in: formData
+        in: body
         name: id
         required: true
-        type: string
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 删除一个模型
       tags:
       - 编辑器
@@ -66,20 +127,28 @@ paths:
     post:
       parameters:
       - description: model's id
-        in: formData
+        in: body
         name: id
         required: true
-        type: string
+        schema:
+          type: string
       - description: code
-        in: formData
+        in: body
         name: code
         required: true
-        type: string
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":"3"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 运行一条语句(用于测试)
       tags:
       - 编辑器
@@ -96,11 +165,17 @@ paths:
         name: num
         required: true
         type: integer
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":"3"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 测试代码是否生成成功, 返回输入整数的下一个整数
       tags:
       - 编辑器
@@ -111,11 +186,17 @@ paths:
         in: query
         name: id
         type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 获取当前状态
       tags:
       - 模拟器
@@ -126,11 +207,38 @@ paths:
         in: query
         name: id
         type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 获取全局变量(对应模拟器中间的全局变量)
+      tags:
+      - 模拟器
+  /simulator/get-local:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 获取各自动机的局部变量(对应模拟器中间的局部变量)
       tags:
       - 模拟器
@@ -141,11 +249,17 @@ paths:
         in: query
         name: id
         type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 获取使能迁移中所有可能的下一步
       tags:
       - 模拟器
@@ -156,11 +270,17 @@ paths:
         in: query
         name: id
         type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 获取同步情况(对应模拟器右下角的同步图)
       tags:
       - 模拟器
@@ -171,11 +291,17 @@ paths:
         in: query
         name: id
         type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 获取模拟Trace
       tags:
       - 模拟器
@@ -183,14 +309,22 @@ paths:
     post:
       parameters:
       - description: trace path
-        in: formData
+        in: body
         name: file
-        type: string
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 打开模拟Trace
       tags:
       - 模拟器
@@ -198,14 +332,22 @@ paths:
     post:
       parameters:
       - description: model id
-        in: formData
+        in: body
         name: id
-        type: string
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 随机模拟Trace
       tags:
       - 模拟器
@@ -213,14 +355,22 @@ paths:
     post:
       parameters:
       - description: model id
-        in: formData
+        in: body
         name: id
-        type: string
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 重置使能迁移, 复位
       tags:
       - 模拟器
@@ -228,14 +378,22 @@ paths:
     post:
       parameters:
       - description: model id
-        in: formData
+        in: body
         name: id
-        type: string
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 保存模拟Trace
       tags:
       - 模拟器
@@ -246,11 +404,17 @@ paths:
         in: query
         name: id
         type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 获取使能迁移中所有可能的下一步
       tags:
       - 模拟器
@@ -258,34 +422,58 @@ paths:
     post:
       parameters:
       - description: automaton's id
-        in: formData
+        in: body
         name: id
-        type: string
+        required: true
+        schema:
+          type: string
       - description: parameters of the automaton
-        in: formData
+        in: body
         name: param
-        type: string
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 使能迁移下一步，根据自动机的id/transition的id/select的参数使模型步进一次，并返回步进结果和下一次可步进的自动机
       tags:
       - 模拟器
   /verify:
     post:
       parameters:
+      - description: model id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
       - description: property
-        in: formData
+        in: body
         name: property
-        type: string
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
       summary: 验证某条性质是否成立
       tags:
       - 验证器
+      - Main
 swagger: "2.0"

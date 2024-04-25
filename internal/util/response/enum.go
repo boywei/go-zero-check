@@ -1,4 +1,4 @@
-package enum
+package response
 
 /*
 错误码设计
@@ -8,8 +8,8 @@ package enum
 */
 
 var (
-	Success = &ErrCode{Code: 200, Message: "SUCCESS"}
-	Failure = &ErrCode{Code: 400, Message: "FAILURE"}
+	SuccessResp = &ErrCode{Code: 200, Message: "SUCCESS"}
+	FailureResp = &ErrCode{Code: 400, Message: "FAILURE"}
 
 	// 系统错误, 前缀是100
 	InternalServerError = &ErrCode{Code: 10001, Message: "内部服务器错误"}
@@ -22,5 +22,9 @@ var (
 	ModelRunErr     = &ErrCode{Code: 20203, Message: "模型运行失败"}
 
 	// SynLong/Lustre错误, 前缀是201
-	SynLongConvertErr     = &ErrCode{Code: 20101, Message: "SynLong模型转换失败"}
+	SynLongConvertErr = &ErrCode{Code: 20101, Message: "SynLong模型转换失败"}
+	SynLongDataflowErr = &ErrCode{Code: 20102, Message: "SynLong数据流验证失败"}
+
+	// 验证器错误, 前缀是203
+	ModelVerifyErr = &ErrCode{Code: 20301, Message: "模型验证错误"}
 )

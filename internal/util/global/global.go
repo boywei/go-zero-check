@@ -1,21 +1,19 @@
 package global
 
 import (
-	"github.com/traefik/yaegi/interp"
-	"os"
+	"errors"
+	log "github.com/sirupsen/logrus"
 )
 
-type ModelMap struct {
-	Name   string
-	Path   string              // 模型的生成目录
-	Interp *interp.Interpreter // 模型的解释器地址
-}
-
-var (
-	ModelIdMap = make(map[string]*ModelMap)
-)
-
-// Crush 删除当前model时释放资源
-func (model *ModelMap) Crush() {
-	os.RemoveAll(model.Path)
+// DeleteModelById 根据id删除对应的模型
+func DeleteModelById(id string) (err error) {
+	// 删除modelMap中的内容
+	m, ok := ModelIdMap[id]
+	if !ok {
+		log.Warnln(id, "not exists")
+		return errors.New("id not exists")
+	}
+	m.RemoveDir()
+	delete(ModelIdMap, id)
+	return nil
 }

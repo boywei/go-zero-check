@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/boywei/go-zero-check/internal/util/enum"
 	"github.com/boywei/go-zero-check/internal/util/response"
 	"github.com/gin-gonic/gin"
 )
@@ -13,8 +12,10 @@ import (
 //
 //	@Tags		模拟器
 //	@Summary	获取使能迁移中所有可能的下一步
-//	@Param		id	query		string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	query	string	false	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/start [get]
 func Start(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -27,14 +28,18 @@ func Start(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	使能迁移下一步，根据自动机的id/transition的id/select的参数使模型步进一次，并返回步进结果和下一次可步进的自动机
-//	@Param		id		formData	string	false	"automaton's id"
-//	@Param		param	formData	string	false	"parameters of the automaton"
-//	@Success	200		{string}	json	"{"code":"200","data":""}"
+//	@Param		id		body	string	true	"automaton's id"
+//	@Param		param	body	string	false	"parameters of the automaton"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/step [post]
 func Step(c *gin.Context) {
-	id := c.PostForm("id")
+	content := make(map[string]string)
+	c.BindJSON(&content)
+	id := content["id"]
 	if id == "" {
-		response.Failure(c, enum.InvalidParam)
+		response.Failure(c, response.InvalidParam)
 		return
 	}
 	// 先选择自动机，再选择该自动机可选的参数，再运行得到下一步；
@@ -50,8 +55,10 @@ func Step(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	获取使能迁移中所有可能的下一步
-//	@Param		id	query		string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	query	string	false	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/get-next [get]
 func GetNext(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -64,8 +71,10 @@ func GetNext(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	重置使能迁移, 复位
-//	@Param		id	formData	string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	body	string	true	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/reset [post]
 func Reset(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -78,8 +87,10 @@ func Reset(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	获取模拟Trace
-//	@Param		id	query		string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	query	string	false	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/get-trace [get]
 func GetTrace(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -92,8 +103,10 @@ func GetTrace(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	保存模拟Trace
-//	@Param		id	formData	string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	body	string	true	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/save-trace [post]
 func SaveTrace(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -106,8 +119,10 @@ func SaveTrace(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	打开模拟Trace
-//	@Param		file	formData	string	false	"trace path"
-//	@Success	200		{string}	json	"{"code":"200","data":""}"
+//	@Param		file	body	string	true	"trace path"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/open-trace [post]
 func OpenTrace(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -120,8 +135,10 @@ func OpenTrace(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	随机模拟Trace
-//	@Param		id	formData	string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	body	string	true	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/random-trace [post]
 func RandomTrace(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -134,8 +151,10 @@ func RandomTrace(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	获取全局变量(对应模拟器中间的全局变量)
-//	@Param		id	query		string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	query	string	false	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/get-global [get]
 func GetGlobal(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -148,9 +167,11 @@ func GetGlobal(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	获取各自动机的局部变量(对应模拟器中间的局部变量)
-//	@Param		id	query		string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
-//	@Router		/simulator/get-global [get]
+//	@Param		id	query	string	false	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
+//	@Router		/simulator/get-local [get]
 func GetLocal(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": 200,
@@ -162,8 +183,10 @@ func GetLocal(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	获取当前状态
-//	@Param		id	query		string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	query	string	false	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/get-current-status [get]
 func GetCurrentStatus(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
@@ -176,8 +199,10 @@ func GetCurrentStatus(c *gin.Context) {
 //
 //	@Tags		模拟器
 //	@Summary	获取同步情况(对应模拟器右下角的同步图)
-//	@Param		id	query		string	false	"model id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	query	string	false	"model id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/simulator/get-sync [get]
 func GetSync(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{

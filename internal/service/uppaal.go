@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"os"
 	"strconv"
@@ -9,8 +10,6 @@ import (
 
 	"github.com/boywei/go-zero-check/internal/util/cmd"
 
-	"github.com/boywei/go-zero-check/internal/middleware"
-	"github.com/boywei/go-zero-check/internal/util/enum"
 	"github.com/boywei/go-zero-check/internal/util/global"
 	"github.com/boywei/go-zero-check/internal/util/json"
 	"github.com/boywei/go-zero-check/internal/util/response"
@@ -22,22 +21,26 @@ import (
 
 // Convert
 //
-//	@Tags		编辑器
+//	@Tags		编辑器, Main
 //	@Summary	前端传过来的JSON转Go对象
-//	@Param		file	formData	string	false	"json file path"
-//	@Success	200		{string}	json	"{"code":"200","data":""}"
+//	@Param		file	body	string	true	"JSON file"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/model/convert [post]
 func Convert(c *gin.Context) {
-	file := c.PostForm("file")
+	content := make(map[string]string)
+	c.BindJSON(&content)
+	file := content["file"]
 	if file == "" {
 		log.Errorln("Empty file")
-		response.Failure(c, enum.InvalidParam)
+		response.Failure(c, response.InvalidParam)
 		return
 	}
 	object, err := json.ConvertJson2Uppaal(file)
 	if err != nil {
 		log.Errorln("JSON decode error: ", err)
-		response.Failure(c, enum.InvalidParam)
+		response.Failure(c, response.InvalidParam)
 		return
 	}
 
@@ -51,7 +54,7 @@ func Convert(c *gin.Context) {
 			_ = os.Mkdir(modelPath, os.ModePerm)
 		} else { // 其他错误
 			log.Errorln("Mkdir err: ", err)
-			response.Failure(c, enum.ModelConvertErr)
+			response.Failure(c, response.ModelConvertErr)
 			return
 		}
 	}
@@ -86,13 +89,13 @@ func Convert(c *gin.Context) {
 	defer df.Close()
 	if err != nil {
 		log.Errorln("Create declaration file err: ", err)
-		response.Failure(c, enum.ModelConvertErr)
+		response.Failure(c, response.ModelConvertErr)
 		return
 	}
 	_, err = df.WriteString("package " + modelName + "\n\n" + string(object.Declaration))
 	if err != nil {
 		log.Errorln("Write global declaration err: ", err)
-		response.Failure(c, enum.ModelConvertErr)
+		response.Failure(c, response.ModelConvertErr)
 		return
 	}
 	// 2. 处理Automatons -> 针对每个自动机，生成<automaton_name>.go文件
@@ -105,20 +108,24 @@ func Convert(c *gin.Context) {
 		defer f.Close()
 		if err != nil {
 			log.Errorln("Handle automaton err: ", err)
-			response.Failure(c, enum.ModelConvertErr)
+			response.Failure(c, response.ModelConvertErr)
 			return
 		}
 		builder.WriteString("package " + modelName + "\n\n")
 		// TODO 修改声明的方式，根据parameter来声明
+		builder.WriteString("var " + string(automaton.Parameters) + "\n\n")
 		builder.WriteString("var (\n\t" + automaton.Name + " = &Automaton{\n")
 		builder.WriteString("\t\tName: \"" + automaton.Name + "\",\n")
 
 		// 2) Parameters  []Parameter
-		builder.WriteString("\t\tParameters: []string{\n")
-		for _, parameter := range automaton.Parameters {
-			builder.WriteString("\t\t\t\"" + string(parameter) + "\",\n")
-		}
-		builder.WriteString("\t\t},\n")
+		//builder.WriteString("\t\tParameters: []string{\n")
+		//for _, parameter := range automaton.Parameters {
+		//	builder.WriteString("\t\t\t\"" + string(parameter) + "\",\n")
+		//}
+		//builder.WriteString("\t\t},\n")
+
+		// 2) Parameters  Parameter
+		builder.WriteString("\t\tParameters: \"" + string(automaton.Parameters) + "\",\n")
 
 		// 3) Locations   []Location
 		builder.WriteString("\t\tLocations: []Location{\n")
@@ -157,7 +164,7 @@ func Convert(c *gin.Context) {
 		_, err = f.WriteString(builder.String())
 		if err != nil {
 			log.Errorln("Write automaton err: ", err)
-			response.Failure(c, enum.ModelConvertErr)
+			response.Failure(c, response.ModelConvertErr)
 			return
 		}
 	}
@@ -166,28 +173,29 @@ func Convert(c *gin.Context) {
 
 	// 4. 使用解释器运行代码, 若无报错则保存声明后的Uppaal对象(使用同一redis缓存！), 并返回生成的uuid字符串
 	// 先保存id并返回新程序信息，再启动
-	uuid, err := middleware.SetModel(object)
+	//id, err := middleware.SetModel(object)
+	id := uuid.NewString()
 	if err != nil {
 		log.Errorln("Cache set model error: ", err)
-		response.Failure(c, enum.ModelRunErr)
+		response.Failure(c, response.ModelRunErr)
 		return
 	}
 	// 保存model的一些全局信息
-	global.ModelIdMap[uuid] = &global.ModelMap{
-		Name:   modelName,
-		Path:   modelPath,
-		Interp: interp.New(interp.Options{}),
+	global.ModelIdMap[id] = &global.Model{
+		Name:        modelName,
+		Path:        modelPath,
+		Interpreter: interp.New(interp.Options{}),
 	}
-	if _, err = cmd.RunStaticCode(uuid); err != nil {
+	if _, err = cmd.RunStaticCode(id); err != nil {
 		log.Errorln("Model run error: ", err)
-		response.Failure(c, enum.ModelRunErr)
+		response.Failure(c, response.ModelRunErr)
 		return
 	}
 
 	// TODO: 5. 解析相关source/target/init
 
 	response.Success(c, gin.H{
-		"id": uuid,
+		"id": id,
 	})
 }
 
@@ -203,19 +211,23 @@ func getValue(data string) string {
 //
 //	@Tags		编辑器
 //	@Summary	删除一个模型
-//	@Param		id	formData	string	true	"model's id"
-//	@Success	200	{string}	json	"{"code":"200","data":""}"
+//	@Param		id	body	string	true	"model's id"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/model/delete [post]
 func DeleteModel(c *gin.Context) {
-	id := c.PostForm("id")
+	content := make(map[string]string)
+	c.BindJSON(&content)
+	id := content["id"]
 	if id == "" {
 		log.Errorln("Empty id")
-		response.Failure(c, enum.InvalidParam)
+		response.Failure(c, response.InvalidParam)
 		return
 	}
-	err := middleware.DeleteModelById(id)
+	err := global.DeleteModelById(id)
 	if err != nil {
-		response.Failure(c, enum.ModelNotExist)
+		response.Failure(c, response.ModelNotExist)
 		return
 	}
 	response.Success(c, nil)
@@ -225,35 +237,37 @@ func DeleteModel(c *gin.Context) {
 //
 //	@Tags		编辑器
 //	@Summary	测试代码是否生成成功, 返回输入整数的下一个整数
-//	@Param		id	query		string	true	"model's id"
-//	@Param		num	query		int		true	"number"
-//	@Success	200	{string}	json	"{"code":"200","data":"3"}"
+//	@Param		id	query	string	true	"model's id"
+//	@Param		num	query	int		true	"number"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/model/test [get]
 func TestModel(c *gin.Context) {
 	id := c.Query("id")
 	num := c.Query("num")
 	if id == "" || num == "" {
 		log.Errorln("Empty param")
-		response.Failure(c, enum.InvalidParam)
+		response.Failure(c, response.InvalidParam)
 		return
 	}
 	value, err := strconv.Atoi(num)
 	if err != nil {
 		log.Errorln("Please input number")
-		response.Failure(c, enum.InvalidParam)
+		response.Failure(c, response.InvalidParam)
 		return
 	}
 	model, ok := global.ModelIdMap[id]
 	if !ok {
 		log.Errorf("%s not exists\n", id)
-		response.Failure(c, enum.ModelNotExist)
+		response.Failure(c, response.ModelNotExist)
 		return
 	}
 	code := model.Name + "." + fmt.Sprintf("Add(%d, 1)", value)
 	result, err := cmd.RunCode(id, code)
 	if err != nil {
 		log.Errorln("Model run error: ", err)
-		response.Failure(c, enum.ModelRunErr)
+		response.Failure(c, response.ModelRunErr)
 		return
 	}
 	response.Success(c, gin.H{
@@ -265,22 +279,26 @@ func TestModel(c *gin.Context) {
 //
 //	@Tags		编辑器
 //	@Summary	运行一条语句(用于测试)
-//	@Param		id		formData	string	true	"model's id"
-//	@Param		code	formData	string	true	"code"
-//	@Success	200		{string}	json	"{"code":"200","data":"3"}"
+//	@Param		id		body	string	true	"model's id"
+//	@Param		code	body	string	true	"code"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/model/run [post]
 func RunModel(c *gin.Context) {
-	id := c.PostForm("id")
-	code := c.PostForm("code")
+	content := make(map[string]string)
+	c.BindJSON(&content)
+	id := content["id"]
+	code := content["code"]
 	if id == "" || code == "" {
 		log.Errorln("Empty param")
-		response.Failure(c, enum.InvalidParam)
+		response.Failure(c, response.InvalidParam)
 		return
 	}
 	result, err := cmd.RunCode(id, code)
 	if err != nil {
 		log.Errorln("Model run error: ", err)
-		response.Failure(c, enum.ModelRunErr)
+		response.Failure(c, response.ModelRunErr)
 		return
 	}
 	response.Success(c, gin.H{

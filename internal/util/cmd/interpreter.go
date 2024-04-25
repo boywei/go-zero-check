@@ -14,7 +14,7 @@ func RunCode(id, code string) (*reflect.Value, error) {
 		log.Warnf("Model path of %s not exists\n", id)
 		return nil, errors.New("model path of " + id + " not exists")
 	}
-	i := model.Interp
+	i := model.Interpreter
 	// 先导入包，不然找不到
 	_, err := i.Eval(`import "./` + model.Path + `"`) // TODO: 这个路径令人疑惑
 	if err != nil {
@@ -36,6 +36,6 @@ func RunStaticCode(id string) (*reflect.Value, error) {
 		log.Warnf("Model path of %s not exists\n", id)
 		return nil, errors.New("model path of " + id + " not exists")
 	}
-	result, err := model.Interp.EvalPath("./" + model.Path) // TODO: 这个路径真是令人疑惑
+	result, err := model.Interpreter.EvalPath("./" + model.Path) // TODO: 这个路径真是令人疑惑
 	return &result, err
 }

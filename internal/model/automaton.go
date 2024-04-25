@@ -2,7 +2,8 @@ package model
 
 type Automaton struct {
 	Name        string       `json:"name"`
-	Parameters  []Parameter  `json:"parameters"`
+	//Parameters  []Parameter  `json:"parameters"`
+	Parameters  Parameter  `json:"parameters"`
 	Locations   []Location   `json:"locations"`
 	Transitions []Transition `json:"transitions"`
 	Init        int          `json:"init"`

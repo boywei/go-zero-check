@@ -2,36 +2,43 @@
   "declaration": "",
   "automatons": [
     {
-      "name": "A",
+      "name": "SM1",
       "parameters": "c1, c2, c3, c4, c5 bool",
       "locations": [
         {
           "id": 1,
-          "name": "A"
+          "name": "A",
+          "invariant": ""
         },
         {
           "id": 2,
-          "name": "B"
+          "name": "B",
+          "invariant": ""
         },
         {
           "id": 3,
-          "name": "C"
+          "name": "C",
+          "invariant": ""
         },
         {
           "id": 4,
-          "name": "D"
+          "name": "D",
+          "invariant": ""
         },
         {
           "id": 5,
-          "name": "E"
+          "name": "E",
+          "invariant": ""
         },
         {
           "id": 6,
-          "name": " "
+          "name": "",
+          "invariant": ""
         },
         {
           "id": 7,
-          "name": " "
+          "name": "",
+          "invariant": ""
         }
       ],
       "transitions": [
@@ -39,42 +46,54 @@
           "id": 1,
           "source_id": 1,
           "target_id": 6,
+          "select": "",
           "guard": "c1",
+          "sync": "",
           "update": "S1()"
         },
         {
           "id": 2,
           "source_id": 6,
           "target_id": 7,
+          "select": "",
           "guard": "!c2",
+          "sync": "",
           "update": "S3()"
         },
         {
           "id": 3,
           "source_id": 6,
           "target_id": 2,
+          "select": "",
           "guard": "c2",
+          "sync": "",
           "update": "S2()"
         },
         {
           "id": 4,
           "source_id": 7,
           "target_id": 3,
+          "select": "",
           "guard": "c4",
+          "sync": "",
           "update": "S4()"
         },
         {
           "id": 5,
           "source_id": 7,
           "target_id": 4,
+          "select": "",
           "guard": "!c4 && c5",
+          "sync": "",
           "update": "S5()"
         },
         {
           "id": 6,
           "source_id": 7,
           "target_id": 5,
+          "select": "",
           "guard": "!c4 && !c5",
+          "sync": "",
           "update": "S6()"
         }
       ],

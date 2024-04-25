@@ -5,4 +5,4 @@ go env -w GOOS=windows
 go env -w GOARCH=amd64
 
 # 打包
-go build -o check-backend main.go
+go build -o check-backend.exe main.go

@@ -17,23 +17,36 @@ const docTemplate = `{
     "paths": {
         "/lustre/check-dataflow": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
+                    "Main",
                     "SynLong方法"
                 ],
                 "summary": "SynLong数据流验证",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "file content",
                         "name": "file",
-                        "in": "formData"
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -41,23 +54,36 @@ const docTemplate = `{
         },
         "/lustre/convert": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
+                    "Main",
                     "SynLong方法"
                 ],
-                "summary": "SynLong转JSON",
+                "summary": "SynLong状态机转JSON",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "file content",
                         "name": "file",
-                        "in": "formData"
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -65,23 +91,36 @@ const docTemplate = `{
         },
         "/model/convert": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
-                    "编辑器"
+                    "编辑器",
+                    "Main"
                 ],
                 "summary": "前端传过来的JSON转Go对象",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "json file path",
+                        "description": "JSON file",
                         "name": "file",
-                        "in": "formData"
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -89,24 +128,35 @@ const docTemplate = `{
         },
         "/model/delete": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "编辑器"
                 ],
                 "summary": "删除一个模型",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "model's id",
                         "name": "id",
-                        "in": "formData",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -114,31 +164,44 @@ const docTemplate = `{
         },
         "/model/run": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "编辑器"
                 ],
                 "summary": "运行一条语句(用于测试)",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "model's id",
                         "name": "id",
-                        "in": "formData",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     {
-                        "type": "string",
                         "description": "code",
                         "name": "code",
-                        "in": "formData",
-                        "required": true
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"3\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -146,6 +209,9 @@ const docTemplate = `{
         },
         "/model/test": {
             "get": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "编辑器"
                 ],
@@ -168,9 +234,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"3\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -178,6 +250,9 @@ const docTemplate = `{
         },
         "/simulator/get-current-status": {
             "get": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
@@ -192,9 +267,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -202,6 +283,42 @@ const docTemplate = `{
         },
         "/simulator/get-global": {
             "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取全局变量(对应模拟器中间的全局变量)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-local": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
@@ -216,9 +333,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -226,6 +349,9 @@ const docTemplate = `{
         },
         "/simulator/get-next": {
             "get": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
@@ -240,9 +366,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -250,6 +382,9 @@ const docTemplate = `{
         },
         "/simulator/get-sync": {
             "get": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
@@ -264,9 +399,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -274,6 +415,9 @@ const docTemplate = `{
         },
         "/simulator/get-trace": {
             "get": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
@@ -288,9 +432,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -298,23 +448,35 @@ const docTemplate = `{
         },
         "/simulator/open-trace": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
                 "summary": "打开模拟Trace",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "trace path",
                         "name": "file",
-                        "in": "formData"
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -322,23 +484,35 @@ const docTemplate = `{
         },
         "/simulator/random-trace": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
                 "summary": "随机模拟Trace",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "model id",
                         "name": "id",
-                        "in": "formData"
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -346,23 +520,35 @@ const docTemplate = `{
         },
         "/simulator/reset": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
                 "summary": "重置使能迁移, 复位",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "model id",
                         "name": "id",
-                        "in": "formData"
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -370,23 +556,35 @@ const docTemplate = `{
         },
         "/simulator/save-trace": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
                 "summary": "保存模拟Trace",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "model id",
                         "name": "id",
-                        "in": "formData"
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -394,6 +592,9 @@ const docTemplate = `{
         },
         "/simulator/start": {
             "get": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
@@ -408,9 +609,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -418,29 +625,43 @@ const docTemplate = `{
         },
         "/simulator/step": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "模拟器"
                 ],
                 "summary": "使能迁移下一步，根据自动机的id/transition的id/select的参数使模型步进一次，并返回步进结果和下一次可步进的自动机",
                 "parameters": [
                     {
-                        "type": "string",
                         "description": "automaton's id",
                         "name": "id",
-                        "in": "formData"
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     {
-                        "type": "string",
                         "description": "parameters of the automaton",
                         "name": "param",
-                        "in": "formData"
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
                         }
                     }
                 }
@@ -448,25 +669,84 @@ const docTemplate = `{
         },
         "/verify": {
             "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
-                    "验证器"
+                    "验证器",
+                    "Main"
                 ],
                 "summary": "验证某条性质是否成立",
                 "parameters": [
                     {
-                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
                         "description": "property",
                         "name": "property",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
                     }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "response.ErrCode": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "错误码",
+                    "type": "integer",
+                    "example": 400
+                },
+                "message": {
+                    "description": "消息",
+                    "type": "string",
+                    "example": "FAILURE"
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "错误码",
+                    "type": "integer",
+                    "example": 200
+                },
+                "data": {
+                    "description": "数据",
+                    "type": "string",
+                    "example": "{}"
+                },
+                "message": {
+                    "description": "消息",
+                    "type": "string",
+                    "example": "SUCCESS"
                 }
             }
         }

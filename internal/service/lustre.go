@@ -1,10 +1,12 @@
 package service
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"github.com/boywei/go-zero-check/internal/util/enum"
 	"github.com/boywei/go-zero-check/internal/util/response"
 	log "github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 	"strings"
 
@@ -13,16 +15,20 @@ import (
 
 // ConvertLustre
 //
-//	@Tags		SynLong方法
+//	@Tags		Main, SynLong方法
 //	@Summary	SynLong状态机转JSON
-//	@Param		file	formData	string	false	"file content"
-//	@Success	200		{string}	json	"{"code":"200","data":""}"
+//	@Param		file	body	string	true	"file content"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/lustre/convert [post]
 func ConvertLustre(c *gin.Context) {
-	file := c.PostForm("file")
+	content := make(map[string]string)
+	c.BindJSON(&content)
+	file := content["file"]
 	if file == "" {
 		log.Errorln("Empty file")
-		response.Failure(c, enum.InvalidParam)
+		response.Failure(c, response.InvalidParam)
 		return
 	}
 	// TODO: 解析SynLong -> JSON
@@ -34,11 +40,12 @@ func ConvertLustre(c *gin.Context) {
 	// 出bug了, 以下写死
 	// example0: 语法错误或不含状态机
 	if !strings.Contains(file, "automaton") {
-		response.Failure(c, enum.SynLongConvertErr)
+		log.Errorln("No automaton found")
+		response.Failure(c, response.SynLongConvertErr)
 		return
 	}
 	// example1: automaton SM1 视频状态机的案例
-	if strings.Contains(file, "SUM") {
+	if strings.Contains(file, "SM1") {
 		response.Success(c, gin.H{
 			"jsonModel": `{
         "declaration": "",
@@ -157,24 +164,37 @@ func ConvertLustre(c *gin.Context) {
 
 // CheckDataflow
 //
-//	@Tags		SynLong方法
+//	@Tags		Main, SynLong方法
 //	@Summary	SynLong数据流验证
-//	@Param		file	formData	string	false	"file content"
-//	@Success	200		{string}	json	"{"code":"200","data":""}"
+//	@Param		file	body	string	true	"file content"
+//	@Produce	json
+//	@Success	200	{object}	response.Response
+//	@Failure	400	{object}	response.ErrCode
 //	@Router		/lustre/check-dataflow [post]
 func CheckDataflow(c *gin.Context) {
-	file := c.PostForm("file")
+	content := make(map[string]string)
+	c.BindJSON(&content)
+	file := content["file"]
 	if file == "" {
-		c.JSON(http.StatusOK, gin.H{
-			"code": -1,
-			"msg":  "文件不能为空",
-		})
+		log.Errorln("Empty file")
+		response.Failure(c, response.InvalidParam)
 		return
 	}
-	// TODO: 调用kind2接口, 需要先下载kind2
 
-	c.JSON(http.StatusOK, gin.H{
-		"code": 200,
-		"data": fmt.Sprintf("converting %s", file),
+	// TODO: 调用熊江的kind2验证接口
+	data := make(map[string]interface{})
+	data["selectedSolver"] = "Z3"
+	data["code"] = file
+	bytesData, _ := json.Marshal(data)
+	resp, err := http.Post("http://localhost:8081/", "application/json", bytes.NewReader(bytesData))
+	if err != nil {
+		log.Errorln("Dataflow check error: ", err)
+		response.Failure(c, response.SynLongDataflowErr)
+		return
+	}
+	body, _ := io.ReadAll(resp.Body)
+
+	response.Success(c, gin.H{
+		"result": string(body),
 	})
 }
