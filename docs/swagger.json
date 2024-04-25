@@ -4,16 +4,40 @@
         "contact": {}
     },
     "paths": {
-        "/convert-lustre": {
+        "/lustre/check-dataflow": {
             "post": {
                 "tags": [
-                    "Lustre方法"
+                    "SynLong方法"
                 ],
-                "summary": "Lustre转Uppaal",
+                "summary": "SynLong数据流验证",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "file path",
+                        "description": "file content",
+                        "name": "file",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/lustre/convert": {
+            "post": {
+                "tags": [
+                    "SynLong方法"
+                ],
+                "summary": "SynLong转JSON",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "file content",
                         "name": "file",
                         "in": "formData"
                     }

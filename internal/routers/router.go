@@ -23,7 +23,7 @@ func Router() *gin.Engine {
 	docs.SwaggerInfo.BasePath = "/"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	// json
+	// 编辑器
 	model := r.Group("/model")
 	{
 		model.POST("/convert", service.Convert)
@@ -33,7 +33,11 @@ func Router() *gin.Engine {
 	}
 
 	// lustre
-	r.POST("/convert-lustre", service.ConvertLustre)
+	lustre := r.Group("/lustre")
+	{
+		lustre.POST("/convert", service.ConvertLustre)
+		lustre.POST("/check-dataflow", service.CheckDataflow)
+	}
 
 	// 模拟器
 	simulator := r.Group("/simulator")

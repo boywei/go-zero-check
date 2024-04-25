@@ -122,6 +122,108 @@ func (s *BaseLustreListener) EnterBound(ctx *BoundContext) {}
 // ExitBound is called when production bound is exited.
 func (s *BaseLustreListener) ExitBound(ctx *BoundContext) {}
 
+// EnterStateMachine is called when production stateMachine is entered.
+func (s *BaseLustreListener) EnterStateMachine(ctx *StateMachineContext) {}
+
+// ExitStateMachine is called when production stateMachine is exited.
+func (s *BaseLustreListener) ExitStateMachine(ctx *StateMachineContext) {}
+
+// EnterStateDecl is called when production stateDecl is entered.
+func (s *BaseLustreListener) EnterStateDecl(ctx *StateDeclContext) {}
+
+// ExitStateDecl is called when production stateDecl is exited.
+func (s *BaseLustreListener) ExitStateDecl(ctx *StateDeclContext) {}
+
+// EnterTransition is called when production transition is entered.
+func (s *BaseLustreListener) EnterTransition(ctx *TransitionContext) {}
+
+// ExitTransition is called when production transition is exited.
+func (s *BaseLustreListener) ExitTransition(ctx *TransitionContext) {}
+
+// EnterArrow is called when production arrow is entered.
+func (s *BaseLustreListener) EnterArrow(ctx *ArrowContext) {}
+
+// ExitArrow is called when production arrow is exited.
+func (s *BaseLustreListener) ExitArrow(ctx *ArrowContext) {}
+
+// EnterFork is called when production fork is entered.
+func (s *BaseLustreListener) EnterFork(ctx *ForkContext) {}
+
+// ExitFork is called when production fork is exited.
+func (s *BaseLustreListener) ExitFork(ctx *ForkContext) {}
+
+// EnterElsifFork is called when production elsifFork is entered.
+func (s *BaseLustreListener) EnterElsifFork(ctx *ElsifForkContext) {}
+
+// ExitElsifFork is called when production elsifFork is exited.
+func (s *BaseLustreListener) ExitElsifFork(ctx *ElsifForkContext) {}
+
+// EnterElseFork is called when production elseFork is entered.
+func (s *BaseLustreListener) EnterElseFork(ctx *ElseForkContext) {}
+
+// ExitElseFork is called when production elseFork is exited.
+func (s *BaseLustreListener) ExitElseFork(ctx *ElseForkContext) {}
+
+// EnterTarget is called when production target is entered.
+func (s *BaseLustreListener) EnterTarget(ctx *TargetContext) {}
+
+// ExitTarget is called when production target is exited.
+func (s *BaseLustreListener) ExitTarget(ctx *TargetContext) {}
+
+// EnterActions is called when production actions is entered.
+func (s *BaseLustreListener) EnterActions(ctx *ActionsContext) {}
+
+// ExitActions is called when production actions is exited.
+func (s *BaseLustreListener) ExitActions(ctx *ActionsContext) {}
+
+// EnterDataDef is called when production dataDef is entered.
+func (s *BaseLustreListener) EnterDataDef(ctx *DataDefContext) {}
+
+// ExitDataDef is called when production dataDef is exited.
+func (s *BaseLustreListener) ExitDataDef(ctx *DataDefContext) {}
+
+// EnterScope is called when production scope is entered.
+func (s *BaseLustreListener) EnterScope(ctx *ScopeContext) {}
+
+// ExitScope is called when production scope is exited.
+func (s *BaseLustreListener) ExitScope(ctx *ScopeContext) {}
+
+// EnterLocalBlock is called when production localBlock is entered.
+func (s *BaseLustreListener) EnterLocalBlock(ctx *LocalBlockContext) {}
+
+// ExitLocalBlock is called when production localBlock is exited.
+func (s *BaseLustreListener) ExitLocalBlock(ctx *LocalBlockContext) {}
+
+// EnterEqs is called when production eqs is entered.
+func (s *BaseLustreListener) EnterEqs(ctx *EqsContext) {}
+
+// ExitEqs is called when production eqs is exited.
+func (s *BaseLustreListener) ExitEqs(ctx *EqsContext) {}
+
+// EnterVarDecl is called when production varDecl is entered.
+func (s *BaseLustreListener) EnterVarDecl(ctx *VarDeclContext) {}
+
+// ExitVarDecl is called when production varDecl is exited.
+func (s *BaseLustreListener) ExitVarDecl(ctx *VarDeclContext) {}
+
+// EnterVarID is called when production varID is entered.
+func (s *BaseLustreListener) EnterVarID(ctx *VarIDContext) {}
+
+// ExitVarID is called when production varID is exited.
+func (s *BaseLustreListener) ExitVarID(ctx *VarIDContext) {}
+
+// EnterDefaultDecl is called when production defaultDecl is entered.
+func (s *BaseLustreListener) EnterDefaultDecl(ctx *DefaultDeclContext) {}
+
+// ExitDefaultDecl is called when production defaultDecl is exited.
+func (s *BaseLustreListener) ExitDefaultDecl(ctx *DefaultDeclContext) {}
+
+// EnterLastDecl is called when production lastDecl is entered.
+func (s *BaseLustreListener) EnterLastDecl(ctx *LastDeclContext) {}
+
+// ExitLastDecl is called when production lastDecl is exited.
+func (s *BaseLustreListener) ExitLastDecl(ctx *LastDeclContext) {}
+
 // EnterProperty is called when production property is entered.
 func (s *BaseLustreListener) EnterProperty(ctx *PropertyContext) {}
 
@@ -158,11 +260,77 @@ func (s *BaseLustreListener) EnterEquation(ctx *EquationContext) {}
 // ExitEquation is called when production equation is exited.
 func (s *BaseLustreListener) ExitEquation(ctx *EquationContext) {}
 
+// EnterSimpleEquation is called when production simpleEquation is entered.
+func (s *BaseLustreListener) EnterSimpleEquation(ctx *SimpleEquationContext) {}
+
+// ExitSimpleEquation is called when production simpleEquation is exited.
+func (s *BaseLustreListener) ExitSimpleEquation(ctx *SimpleEquationContext) {}
+
 // EnterLhs is called when production lhs is entered.
 func (s *BaseLustreListener) EnterLhs(ctx *LhsContext) {}
 
 // ExitLhs is called when production lhs is exited.
 func (s *BaseLustreListener) ExitLhs(ctx *LhsContext) {}
+
+// EnterLhsID is called when production lhsID is entered.
+func (s *BaseLustreListener) EnterLhsID(ctx *LhsIDContext) {}
+
+// ExitLhsID is called when production lhsID is exited.
+func (s *BaseLustreListener) ExitLhsID(ctx *LhsIDContext) {}
+
+// EnterControlBlock is called when production controlBlock is entered.
+func (s *BaseLustreListener) EnterControlBlock(ctx *ControlBlockContext) {}
+
+// ExitControlBlock is called when production controlBlock is exited.
+func (s *BaseLustreListener) ExitControlBlock(ctx *ControlBlockContext) {}
+
+// EnterEmission is called when production emission is entered.
+func (s *BaseLustreListener) EnterEmission(ctx *EmissionContext) {}
+
+// ExitEmission is called when production emission is exited.
+func (s *BaseLustreListener) ExitEmission(ctx *EmissionContext) {}
+
+// EnterEmissionBody is called when production emissionBody is entered.
+func (s *BaseLustreListener) EnterEmissionBody(ctx *EmissionBodyContext) {}
+
+// ExitEmissionBody is called when production emissionBody is exited.
+func (s *BaseLustreListener) ExitEmissionBody(ctx *EmissionBodyContext) {}
+
+// EnterReturn is called when production return is entered.
+func (s *BaseLustreListener) EnterReturn(ctx *ReturnContext) {}
+
+// ExitReturn is called when production return is exited.
+func (s *BaseLustreListener) ExitReturn(ctx *ReturnContext) {}
+
+// EnterReturnVar is called when production returnVar is entered.
+func (s *BaseLustreListener) EnterReturnVar(ctx *ReturnVarContext) {}
+
+// ExitReturnVar is called when production returnVar is exited.
+func (s *BaseLustreListener) ExitReturnVar(ctx *ReturnVarContext) {}
+
+// EnterClockedBlock is called when production clockedBlock is entered.
+func (s *BaseLustreListener) EnterClockedBlock(ctx *ClockedBlockContext) {}
+
+// ExitClockedBlock is called when production clockedBlock is exited.
+func (s *BaseLustreListener) ExitClockedBlock(ctx *ClockedBlockContext) {}
+
+// EnterIfBlock is called when production ifBlock is entered.
+func (s *BaseLustreListener) EnterIfBlock(ctx *IfBlockContext) {}
+
+// ExitIfBlock is called when production ifBlock is exited.
+func (s *BaseLustreListener) ExitIfBlock(ctx *IfBlockContext) {}
+
+// EnterMatchBlock is called when production matchBlock is entered.
+func (s *BaseLustreListener) EnterMatchBlock(ctx *MatchBlockContext) {}
+
+// ExitMatchBlock is called when production matchBlock is exited.
+func (s *BaseLustreListener) ExitMatchBlock(ctx *MatchBlockContext) {}
+
+// EnterPattern is called when production pattern is entered.
+func (s *BaseLustreListener) EnterPattern(ctx *PatternContext) {}
+
+// ExitPattern is called when production pattern is exited.
+func (s *BaseLustreListener) ExitPattern(ctx *PatternContext) {}
 
 // EnterRecordExpr is called when production recordExpr is entered.
 func (s *BaseLustreListener) EnterRecordExpr(ctx *RecordExprContext) {}

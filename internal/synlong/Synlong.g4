@@ -1,4 +1,4 @@
-grammar Lustre;
+grammar Synlong;
 
 program: (typedef | constant | node | function)* EOF;
 

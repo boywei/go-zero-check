@@ -1,0 +1,30 @@
+-- TODO: 还不支持自动机嵌套, 会有一些问题
+node N() returns (x,y : int)
+let
+  automaton A
+  initial state ST1
+  let tel
+  until if true restart ST2 ;
+
+  state ST2
+  var z : int last = 2;
+  let
+    automaton A2
+    initial state ST21
+    unless if x mod 2 = 0 restart ST22;
+    let
+      z = last 'z;
+      x = last 'x;
+    tel
+
+    state ST22
+    let
+      x = last 'x;
+      y = 0 -> pre z;
+    tel
+    until if true restart ST22 ;
+    returns .. ;
+  tel
+  until if true restart ST1 ;
+  returns .. ;
+tel;

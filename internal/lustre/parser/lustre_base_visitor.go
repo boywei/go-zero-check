@@ -76,6 +76,74 @@ func (v *BaseLustreVisitor) VisitBound(ctx *BoundContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseLustreVisitor) VisitStateMachine(ctx *StateMachineContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitStateDecl(ctx *StateDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitTransition(ctx *TransitionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitArrow(ctx *ArrowContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitFork(ctx *ForkContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitElsifFork(ctx *ElsifForkContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitElseFork(ctx *ElseForkContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitTarget(ctx *TargetContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitActions(ctx *ActionsContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitDataDef(ctx *DataDefContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitScope(ctx *ScopeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitLocalBlock(ctx *LocalBlockContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitEqs(ctx *EqsContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitVarDecl(ctx *VarDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitVarID(ctx *VarIDContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitDefaultDecl(ctx *DefaultDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitLastDecl(ctx *LastDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseLustreVisitor) VisitProperty(ctx *PropertyContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -100,7 +168,51 @@ func (v *BaseLustreVisitor) VisitEquation(ctx *EquationContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseLustreVisitor) VisitSimpleEquation(ctx *SimpleEquationContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseLustreVisitor) VisitLhs(ctx *LhsContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitLhsID(ctx *LhsIDContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitControlBlock(ctx *ControlBlockContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitEmission(ctx *EmissionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitEmissionBody(ctx *EmissionBodyContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitReturn(ctx *ReturnContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitReturnVar(ctx *ReturnVarContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitClockedBlock(ctx *ClockedBlockContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitIfBlock(ctx *IfBlockContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitMatchBlock(ctx *MatchBlockContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseLustreVisitor) VisitPattern(ctx *PatternContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

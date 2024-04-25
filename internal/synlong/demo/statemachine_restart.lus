@@ -1,0 +1,29 @@
+node N() returns (x, y: int32 last = 0)
+let
+    automaton A
+        initial state ST1
+        let tel
+        until if true restart ST2 ;
+
+        state ST2
+            var z: int32 last = 2;
+            let
+            automaton A2
+            initial state ST2_1
+            let
+                z = 3 + last ’z;
+                x = last ’x + 1;
+            tel
+            until if x mod 2 = 0 resume ST2_2;
+
+            state ST2_2
+            let
+                x = last ’x -1;
+                y = 0 -> pre z - 1;
+            tel
+            until if true resume ST2_2 ;
+        returns .. ;
+        tel
+        until if true resume ST1 ;
+    returns .. ;
+tel

@@ -1,10 +1,10 @@
 info:
   contact: {}
 paths:
-  /convert-lustre:
+  /lustre/check-dataflow:
     post:
       parameters:
-      - description: file path
+      - description: file content
         in: formData
         name: file
         type: string
@@ -13,9 +13,24 @@ paths:
           description: '{"code":"200","data":""}'
           schema:
             type: string
-      summary: Lustre转Uppaal
+      summary: SynLong数据流验证
       tags:
-      - Lustre方法
+      - SynLong方法
+  /lustre/convert:
+    post:
+      parameters:
+      - description: file content
+        in: formData
+        name: file
+        type: string
+      responses:
+        "200":
+          description: '{"code":"200","data":""}'
+          schema:
+            type: string
+      summary: SynLong转JSON
+      tags:
+      - SynLong方法
   /model/convert:
     post:
       parameters:

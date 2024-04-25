@@ -59,6 +59,57 @@ type LustreListener interface {
 	// EnterBound is called when entering the bound production.
 	EnterBound(c *BoundContext)
 
+	// EnterStateMachine is called when entering the stateMachine production.
+	EnterStateMachine(c *StateMachineContext)
+
+	// EnterStateDecl is called when entering the stateDecl production.
+	EnterStateDecl(c *StateDeclContext)
+
+	// EnterTransition is called when entering the transition production.
+	EnterTransition(c *TransitionContext)
+
+	// EnterArrow is called when entering the arrow production.
+	EnterArrow(c *ArrowContext)
+
+	// EnterFork is called when entering the fork production.
+	EnterFork(c *ForkContext)
+
+	// EnterElsifFork is called when entering the elsifFork production.
+	EnterElsifFork(c *ElsifForkContext)
+
+	// EnterElseFork is called when entering the elseFork production.
+	EnterElseFork(c *ElseForkContext)
+
+	// EnterTarget is called when entering the target production.
+	EnterTarget(c *TargetContext)
+
+	// EnterActions is called when entering the actions production.
+	EnterActions(c *ActionsContext)
+
+	// EnterDataDef is called when entering the dataDef production.
+	EnterDataDef(c *DataDefContext)
+
+	// EnterScope is called when entering the scope production.
+	EnterScope(c *ScopeContext)
+
+	// EnterLocalBlock is called when entering the localBlock production.
+	EnterLocalBlock(c *LocalBlockContext)
+
+	// EnterEqs is called when entering the eqs production.
+	EnterEqs(c *EqsContext)
+
+	// EnterVarDecl is called when entering the varDecl production.
+	EnterVarDecl(c *VarDeclContext)
+
+	// EnterVarID is called when entering the varID production.
+	EnterVarID(c *VarIDContext)
+
+	// EnterDefaultDecl is called when entering the defaultDecl production.
+	EnterDefaultDecl(c *DefaultDeclContext)
+
+	// EnterLastDecl is called when entering the lastDecl production.
+	EnterLastDecl(c *LastDeclContext)
+
 	// EnterProperty is called when entering the property production.
 	EnterProperty(c *PropertyContext)
 
@@ -77,8 +128,41 @@ type LustreListener interface {
 	// EnterEquation is called when entering the equation production.
 	EnterEquation(c *EquationContext)
 
+	// EnterSimpleEquation is called when entering the simpleEquation production.
+	EnterSimpleEquation(c *SimpleEquationContext)
+
 	// EnterLhs is called when entering the lhs production.
 	EnterLhs(c *LhsContext)
+
+	// EnterLhsID is called when entering the lhsID production.
+	EnterLhsID(c *LhsIDContext)
+
+	// EnterControlBlock is called when entering the controlBlock production.
+	EnterControlBlock(c *ControlBlockContext)
+
+	// EnterEmission is called when entering the emission production.
+	EnterEmission(c *EmissionContext)
+
+	// EnterEmissionBody is called when entering the emissionBody production.
+	EnterEmissionBody(c *EmissionBodyContext)
+
+	// EnterReturn is called when entering the return production.
+	EnterReturn(c *ReturnContext)
+
+	// EnterReturnVar is called when entering the returnVar production.
+	EnterReturnVar(c *ReturnVarContext)
+
+	// EnterClockedBlock is called when entering the clockedBlock production.
+	EnterClockedBlock(c *ClockedBlockContext)
+
+	// EnterIfBlock is called when entering the ifBlock production.
+	EnterIfBlock(c *IfBlockContext)
+
+	// EnterMatchBlock is called when entering the matchBlock production.
+	EnterMatchBlock(c *MatchBlockContext)
+
+	// EnterPattern is called when entering the pattern production.
+	EnterPattern(c *PatternContext)
 
 	// EnterRecordExpr is called when entering the recordExpr production.
 	EnterRecordExpr(c *RecordExprContext)
@@ -197,6 +281,57 @@ type LustreListener interface {
 	// ExitBound is called when exiting the bound production.
 	ExitBound(c *BoundContext)
 
+	// ExitStateMachine is called when exiting the stateMachine production.
+	ExitStateMachine(c *StateMachineContext)
+
+	// ExitStateDecl is called when exiting the stateDecl production.
+	ExitStateDecl(c *StateDeclContext)
+
+	// ExitTransition is called when exiting the transition production.
+	ExitTransition(c *TransitionContext)
+
+	// ExitArrow is called when exiting the arrow production.
+	ExitArrow(c *ArrowContext)
+
+	// ExitFork is called when exiting the fork production.
+	ExitFork(c *ForkContext)
+
+	// ExitElsifFork is called when exiting the elsifFork production.
+	ExitElsifFork(c *ElsifForkContext)
+
+	// ExitElseFork is called when exiting the elseFork production.
+	ExitElseFork(c *ElseForkContext)
+
+	// ExitTarget is called when exiting the target production.
+	ExitTarget(c *TargetContext)
+
+	// ExitActions is called when exiting the actions production.
+	ExitActions(c *ActionsContext)
+
+	// ExitDataDef is called when exiting the dataDef production.
+	ExitDataDef(c *DataDefContext)
+
+	// ExitScope is called when exiting the scope production.
+	ExitScope(c *ScopeContext)
+
+	// ExitLocalBlock is called when exiting the localBlock production.
+	ExitLocalBlock(c *LocalBlockContext)
+
+	// ExitEqs is called when exiting the eqs production.
+	ExitEqs(c *EqsContext)
+
+	// ExitVarDecl is called when exiting the varDecl production.
+	ExitVarDecl(c *VarDeclContext)
+
+	// ExitVarID is called when exiting the varID production.
+	ExitVarID(c *VarIDContext)
+
+	// ExitDefaultDecl is called when exiting the defaultDecl production.
+	ExitDefaultDecl(c *DefaultDeclContext)
+
+	// ExitLastDecl is called when exiting the lastDecl production.
+	ExitLastDecl(c *LastDeclContext)
+
 	// ExitProperty is called when exiting the property production.
 	ExitProperty(c *PropertyContext)
 
@@ -215,8 +350,41 @@ type LustreListener interface {
 	// ExitEquation is called when exiting the equation production.
 	ExitEquation(c *EquationContext)
 
+	// ExitSimpleEquation is called when exiting the simpleEquation production.
+	ExitSimpleEquation(c *SimpleEquationContext)
+
 	// ExitLhs is called when exiting the lhs production.
 	ExitLhs(c *LhsContext)
+
+	// ExitLhsID is called when exiting the lhsID production.
+	ExitLhsID(c *LhsIDContext)
+
+	// ExitControlBlock is called when exiting the controlBlock production.
+	ExitControlBlock(c *ControlBlockContext)
+
+	// ExitEmission is called when exiting the emission production.
+	ExitEmission(c *EmissionContext)
+
+	// ExitEmissionBody is called when exiting the emissionBody production.
+	ExitEmissionBody(c *EmissionBodyContext)
+
+	// ExitReturn is called when exiting the return production.
+	ExitReturn(c *ReturnContext)
+
+	// ExitReturnVar is called when exiting the returnVar production.
+	ExitReturnVar(c *ReturnVarContext)
+
+	// ExitClockedBlock is called when exiting the clockedBlock production.
+	ExitClockedBlock(c *ClockedBlockContext)
+
+	// ExitIfBlock is called when exiting the ifBlock production.
+	ExitIfBlock(c *IfBlockContext)
+
+	// ExitMatchBlock is called when exiting the matchBlock production.
+	ExitMatchBlock(c *MatchBlockContext)
+
+	// ExitPattern is called when exiting the pattern production.
+	ExitPattern(c *PatternContext)
 
 	// ExitRecordExpr is called when exiting the recordExpr production.
 	ExitRecordExpr(c *RecordExprContext)

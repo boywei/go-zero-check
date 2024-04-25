@@ -5,9 +5,7 @@ import (
 	"fmt"
 
 	"github.com/boywei/go-zero-check/config"
-	"github.com/boywei/go-zero-check/internal/middleware"
 	"github.com/boywei/go-zero-check/internal/routers"
-	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -31,10 +29,10 @@ func init() {
 	// spew.Dump(conf)
 
 	// 使用redis作为缓存
-	err := middleware.SetupRedisDb(conf.Redis.Addr, conf.Redis.Password)
-	if err != nil {
-		log.Fatalf("init.SetupRedisDb err: %v", err)
-	}
+	//err := middleware.SetupRedisDb(conf.Redis.Addr, conf.Redis.Password)
+	//if err != nil {
+	//	log.Fatalf("init.SetupRedisDb err: %v", err)
+	//}
 
 }
 

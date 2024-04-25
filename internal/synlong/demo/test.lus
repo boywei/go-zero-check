@@ -1,5 +1,4 @@
 const
-const
     FAULT : bool = false;
 type
     signal = struct {
