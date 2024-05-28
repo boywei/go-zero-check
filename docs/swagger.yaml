@@ -1,19 +1,479 @@
+definitions:
+  response.ErrCode:
+    properties:
+      code:
+        description: 错误码
+        example: 400
+        type: integer
+      message:
+        description: 消息
+        example: FAILURE
+        type: string
+    type: object
+  response.Response:
+    properties:
+      code:
+        description: 错误码
+        example: 200
+        type: integer
+      data:
+        description: 数据
+        example: '{}'
+        type: string
+      message:
+        description: 消息
+        example: SUCCESS
+        type: string
+    type: object
 info:
   contact: {}
 paths:
-  /convert:
+  /lustre/check-dataflow:
     post:
       parameters:
-      - description: file path
-        in: formData
+      - description: file content
+        in: body
         name: file
-        type: string
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: '{"code":"200","data":""}'
+          description: OK
           schema:
-            type: string
-      summary: Lustre转Uppaal
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: SynLong数据流验证
       tags:
-      - Lustre方法
+      - Main
+      - SynLong方法
+  /lustre/convert:
+    post:
+      parameters:
+      - description: file content
+        in: body
+        name: file
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: SynLong状态机转JSON
+      tags:
+      - Main
+      - SynLong方法
+  /model/convert:
+    post:
+      parameters:
+      - description: JSON file
+        in: body
+        name: file
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 前端传过来的JSON转Go对象
+      tags:
+      - 编辑器
+      - Main
+  /model/delete:
+    post:
+      parameters:
+      - description: model's id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 删除一个模型
+      tags:
+      - 编辑器
+  /model/run:
+    post:
+      parameters:
+      - description: model's id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: code
+        in: body
+        name: code
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 运行一条语句(用于测试)
+      tags:
+      - 编辑器
+  /model/test:
+    get:
+      parameters:
+      - description: model's id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: number
+        in: query
+        name: num
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 测试代码是否生成成功, 返回输入整数的下一个整数
+      tags:
+      - 编辑器
+  /simulator/get-current-status:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 获取当前状态
+      tags:
+      - 模拟器
+  /simulator/get-global:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 获取全局变量(对应模拟器中间的全局变量)
+      tags:
+      - 模拟器
+  /simulator/get-local:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 获取各自动机的局部变量(对应模拟器中间的局部变量)
+      tags:
+      - 模拟器
+  /simulator/get-next:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 获取使能迁移中所有可能的下一步
+      tags:
+      - 模拟器
+  /simulator/get-sync:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 获取同步情况(对应模拟器右下角的同步图)
+      tags:
+      - 模拟器
+  /simulator/get-trace:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 获取模拟Trace
+      tags:
+      - 模拟器
+  /simulator/open-trace:
+    post:
+      parameters:
+      - description: trace path
+        in: body
+        name: file
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 打开模拟Trace
+      tags:
+      - 模拟器
+  /simulator/random-trace:
+    post:
+      parameters:
+      - description: model id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 随机模拟Trace
+      tags:
+      - 模拟器
+  /simulator/reset:
+    post:
+      parameters:
+      - description: model id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 重置使能迁移, 复位
+      tags:
+      - 模拟器
+  /simulator/save-trace:
+    post:
+      parameters:
+      - description: model id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 保存模拟Trace
+      tags:
+      - 模拟器
+  /simulator/start:
+    get:
+      parameters:
+      - description: model id
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 获取使能迁移中所有可能的下一步
+      tags:
+      - 模拟器
+  /simulator/step:
+    post:
+      parameters:
+      - description: automaton's id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: parameters of the automaton
+        in: body
+        name: param
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 使能迁移下一步，根据自动机的id/transition的id/select的参数使模型步进一次，并返回步进结果和下一次可步进的自动机
+      tags:
+      - 模拟器
+  /verify:
+    post:
+      parameters:
+      - description: model id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: property
+        in: body
+        name: property
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrCode'
+      summary: 验证某条性质是否成立
+      tags:
+      - 验证器
+      - Main
 swagger: "2.0"

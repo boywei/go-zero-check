@@ -1,60 +1,49 @@
 package model
 
 type Automaton struct {
-	Name        string
-	Parameters  []Parameter
-	Locations   []Location
-	Transitions []Transition
-	Init        Location
+	Name        string       `json:"name"`
+	//Parameters  []Parameter  `json:"parameters"`
+	Parameters  Parameter  `json:"parameters"`
+	Locations   []Location   `json:"locations"`
+	Transitions []Transition `json:"transitions"`
+	Init        int          `json:"init"`
 
-	Declarations Declaration
+	Declaration  Declaration `json:"declaration"`
+	InitLocation Location    //需要解析
 }
+
+type Parameter string
 
 // 第一层次: 自动机的主要元素
 
 type Location struct {
 	State
-	Id        int
-	Name      string
-	Invariant Invariant
+	Id        int    `json:"id"`
+	Name      string `json:"name"`
+	Invariant string `json:"invariant"`
 }
 
 type Nail struct {
 	State
-	Id int
+	Id int `json:"id"`
 }
 
 type State interface {
 }
 
 type Transition struct {
-	Id            int
-	SourceId      int
-	DestinationId int
-	Select        Select
-	Guard         Guard
-	Sync          Sync
-	Update        Update
-	Source        State // 需要解析
-	Destination   State // 需要解析
+	Id            int    `json:"id"`
+	SourceId      int    `json:"source_id"`
+	DestinationId int    `json:"destination_id"`
+	Select        string `json:"select"`
+	Guard         string `json:"guard"`
+	Sync          string `json:"sync"`
+	Update        string `json:"update"`
+	Source        State  // 需要解析
+	Destination   State  // 需要解析
 }
 
 // TODO: 第二层次: 自动机各元素上的标签
-
-type Select struct {
-}
-
-type Guard struct {
-}
-
-type Sync interface {
-}
-
-type Update struct {
-}
-
-type Invariant struct {
-}
 
 type Probability struct {
 }

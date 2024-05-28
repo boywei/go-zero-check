@@ -1,0 +1,33 @@
+const
+    FAULT : bool = false;
+type
+    signal = struct {
+    status : bool;
+    value : int
+};
+
+node SUM(
+    Input1 : int;
+    Input2 : int)
+returns (
+    Output1 : int);
+var
+    L0 : int;
+    L1 : int;
+    L2 : int;
+    L3 : int;
+    L4 : bool;
+    L5 : int;
+    L6 : signal;
+let
+    L0 = Input1;
+    L1 = Input2;
+    L2 = L0;
+    L3 = L1;
+    L4 = FAULT;
+    L5 = L2 + L3;
+    L6 = signal{status=L4;value=L5};
+    Output1 = L6.value;
+
+--%PROPERTY Output1 = L0 + L1;
+tel

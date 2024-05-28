@@ -1,0 +1,11 @@
+dump.rdb
+check-backend
+check-backend.exe
+
+.idea/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store

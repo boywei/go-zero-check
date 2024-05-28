@@ -1,0 +1,86 @@
+{
+  "declaration": "",
+  "automatons": [
+    {
+      "name": "A",
+      "parameters": "c1, c2, c3, c4, c5 bool",
+      "locations": [
+        {
+          "id": 1,
+          "name": "A"
+        },
+        {
+          "id": 2,
+          "name": "B"
+        },
+        {
+          "id": 3,
+          "name": "C"
+        },
+        {
+          "id": 4,
+          "name": "D"
+        },
+        {
+          "id": 5,
+          "name": "E"
+        },
+        {
+          "id": 6,
+          "name": " "
+        },
+        {
+          "id": 7,
+          "name": " "
+        }
+      ],
+      "transitions": [
+        {
+          "id": 1,
+          "source_id": 1,
+          "target_id": 6,
+          "guard": "c1",
+          "update": "S1()"
+        },
+        {
+          "id": 2,
+          "source_id": 6,
+          "target_id": 7,
+          "guard": "!c2",
+          "update": "S3()"
+        },
+        {
+          "id": 3,
+          "source_id": 6,
+          "target_id": 2,
+          "guard": "c2",
+          "update": "S2()"
+        },
+        {
+          "id": 4,
+          "source_id": 7,
+          "target_id": 3,
+          "guard": "c4",
+          "update": "S4()"
+        },
+        {
+          "id": 5,
+          "source_id": 7,
+          "target_id": 4,
+          "guard": "!c4 && c5",
+          "update": "S5()"
+        },
+        {
+          "id": 6,
+          "source_id": 7,
+          "target_id": 5,
+          "guard": "!c4 && !c5",
+          "update": "S6()"
+        }
+      ],
+      "init": 1,
+      "declaration": "func S1(){}\n\nfunc S2(){}\n\nfunc S3(){}\n\nfunc S4(){}\n\nfunc S5(){}\n\nfunc S6(){}"
+    }
+  ],
+  "system_declaration": "system A;"
+}

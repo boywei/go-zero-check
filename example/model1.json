@@ -1,0 +1,38 @@
+{
+  "declaration": "func Add(a, b int) int { return a + b }; type Student struct{ Name string; Age int }; var ( Cnt = 0; Num = 5 )",
+  "automatons": [
+    {
+      "name": "ego",
+      "parameters": "automaton_parameter1",
+      "locations": [
+        {
+          "id": 1,
+          "name": "start"
+        },
+        {
+          "id": 2,
+          "name": "end"
+        }
+      ],
+      "transitions": [
+        {
+          "id": 1,
+          "source_id": 1,
+          "target_id": 2,
+          "guard": "clock >= 0",
+          "update": "decrease()"
+        },
+        {
+          "id": 2,
+          "source_id": 2,
+          "target_id": 1,
+          "guard": "clock < 0",
+          "update": "clock += 1"
+        }
+      ],
+      "init": 1,
+      "declaration": "var clock = 0; func increase() { clock += 1 }; func decrease() { clock -= 1 }"
+    }
+  ],
+  "system_declaration": ""
+}

@@ -15,27 +15,738 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/convert": {
+        "/lustre/check-dataflow": {
             "post": {
-                "tags": [
-                    "Lustre方法"
+                "produces": [
+                    "application/json"
                 ],
-                "summary": "Lustre转Uppaal",
+                "tags": [
+                    "Main",
+                    "SynLong方法"
+                ],
+                "summary": "SynLong数据流验证",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "file path",
+                        "description": "file content",
                         "name": "file",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\":\"200\",\"data\":\"\"}",
+                        "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
                     }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/lustre/convert": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Main",
+                    "SynLong方法"
+                ],
+                "summary": "SynLong状态机转JSON",
+                "parameters": [
+                    {
+                        "description": "file content",
+                        "name": "file",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/model/convert": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "编辑器",
+                    "Main"
+                ],
+                "summary": "前端传过来的JSON转Go对象",
+                "parameters": [
+                    {
+                        "description": "JSON file",
+                        "name": "file",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/model/delete": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "编辑器"
+                ],
+                "summary": "删除一个模型",
+                "parameters": [
+                    {
+                        "description": "model's id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/model/run": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "编辑器"
+                ],
+                "summary": "运行一条语句(用于测试)",
+                "parameters": [
+                    {
+                        "description": "model's id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "code",
+                        "name": "code",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/model/test": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "编辑器"
+                ],
+                "summary": "测试代码是否生成成功, 返回输入整数的下一个整数",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model's id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "number",
+                        "name": "num",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-current-status": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取当前状态",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-global": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取全局变量(对应模拟器中间的全局变量)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-local": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取各自动机的局部变量(对应模拟器中间的局部变量)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-next": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取使能迁移中所有可能的下一步",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-sync": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取同步情况(对应模拟器右下角的同步图)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/get-trace": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取模拟Trace",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/open-trace": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "打开模拟Trace",
+                "parameters": [
+                    {
+                        "description": "trace path",
+                        "name": "file",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/random-trace": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "随机模拟Trace",
+                "parameters": [
+                    {
+                        "description": "model id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/reset": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "重置使能迁移, 复位",
+                "parameters": [
+                    {
+                        "description": "model id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/save-trace": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "保存模拟Trace",
+                "parameters": [
+                    {
+                        "description": "model id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/start": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "获取使能迁移中所有可能的下一步",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model id",
+                        "name": "id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/simulator/step": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "模拟器"
+                ],
+                "summary": "使能迁移下一步，根据自动机的id/transition的id/select的参数使模型步进一次，并返回步进结果和下一次可步进的自动机",
+                "parameters": [
+                    {
+                        "description": "automaton's id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "parameters of the automaton",
+                        "name": "param",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        },
+        "/verify": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "验证器",
+                    "Main"
+                ],
+                "summary": "验证某条性质是否成立",
+                "parameters": [
+                    {
+                        "description": "model id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "property",
+                        "name": "property",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrCode"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "response.ErrCode": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "错误码",
+                    "type": "integer",
+                    "example": 400
+                },
+                "message": {
+                    "description": "消息",
+                    "type": "string",
+                    "example": "FAILURE"
+                }
+            }
+        },
+        "response.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "错误码",
+                    "type": "integer",
+                    "example": 200
+                },
+                "data": {
+                    "description": "数据",
+                    "type": "string",
+                    "example": "{}"
+                },
+                "message": {
+                    "description": "消息",
+                    "type": "string",
+                    "example": "SUCCESS"
                 }
             }
         }
