@@ -1,3 +1,3 @@
 package test
 
-int
+//Place global declarations here.

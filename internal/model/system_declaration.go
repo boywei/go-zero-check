@@ -1,3 +1,3 @@
 package model
 
-type SystemDeclaration []string
+type SystemDeclaration string

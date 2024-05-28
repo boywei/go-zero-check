@@ -150,15 +150,13 @@ func ConvertLustre(c *gin.Context) {
             "declaration": "func S1(){}\n\nfunc S2(){}\n\nfunc S3(){}\n\nfunc S4(){}\n\nfunc S5(){}\n\nfunc S6(){}"
           }
         ],
-        "system_declaration": [
-          "system A;"
-        ]
+        "system_declaration": "system A;"
       }`,
 		})
 		return
 	}
 	response.Success(c, gin.H{
-		"id": fmt.Sprintf("converting %s", file),
+		"jsonModel": fmt.Sprintf("%s", file),
 	})
 }
 

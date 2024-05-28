@@ -34,7 +34,5 @@
       "declaration": "var clock = 0; func increase() { clock += 1 }; func decrease() { clock -= 1 }"
     }
   ],
-  "system_declaration": [
-    ""
-  ]
+  "system_declaration": ""
 }

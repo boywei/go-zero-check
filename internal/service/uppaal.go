@@ -44,9 +44,14 @@ func Convert(c *gin.Context) {
 		return
 	}
 
+	system := os.Getenv("GOOS")
+
 	// 0. 新建模型目录, 拷贝define文件
 	modelName := "test"
 	modelPath := "demo/" + modelName + "/"
+	if system == "windows" {
+		modelPath = "demo\\" + modelName + "\\"
+	}
 	err = os.Mkdir(modelPath, os.ModePerm)
 	if err != nil {
 		if os.IsExist(err) { // 当前目录已经存在, 那么清空
@@ -61,12 +66,18 @@ func Convert(c *gin.Context) {
 
 	// 复制define.go文件到模型目录下
 	sourceFile, err := os.Open("demo/define.txt")
+	if system == "windows" {
+		sourceFile, err = os.Open("demo\\define.txt")
+	}
 	if err != nil {
 		panic(err)
 	}
 	defer sourceFile.Close()
 
 	destinationFile, err := os.Create("demo/" + modelName + "/define.go")
+	if system == "windows" {
+		destinationFile, err = os.Create("demo\\" + modelName + "\\define.go")
+	}
 	if err != nil {
 		panic(err)
 	}

@@ -29,5 +29,5 @@ func Success(c *gin.Context, data interface{}) {
 
 // Failure 请求失败
 func Failure(c *gin.Context, errCode *ErrCode) {
-	c.JSON(http.StatusBadRequest, errCode)
+	c.JSON(http.StatusOK, errCode)
 }
