@@ -3,10 +3,10 @@ module github.com/boywei/go-zero-check
 go 1.20
 
 require (
-	github.com/antlr4-go/antlr v0.0.0-20230518091524-98b52378c522
 	github.com/antlr4-go/antlr/v4 v4.13.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.4.0
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.18.2
 	github.com/swaggo/files v1.0.1

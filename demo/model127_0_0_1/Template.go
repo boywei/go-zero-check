@@ -1,4 +1,4 @@
-package test
+package model127_0_0_1
 
 var id int
 
@@ -17,20 +17,6 @@ var (
 			{
 				Id: 2,
 				Name: "end",
-				Invariant: func() bool {
-					return true
-				},
-			},
-			{
-				Id: 3,
-				Name: "",
-				Invariant: func() bool {
-					return true
-				},
-			},
-			{
-				Id: 4,
-				Name: "",
 				Invariant: func() bool {
 					return true
 				},

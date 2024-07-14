@@ -196,47 +196,6 @@
                 }
             }
         },
-        "/model/test": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "编辑器"
-                ],
-                "summary": "测试代码是否生成成功, 返回输入整数的下一个整数",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "model's id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "number",
-                        "name": "num",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/response.ErrCode"
-                        }
-                    }
-                }
-            }
-        },
         "/simulator/get-current-status": {
             "get": {
                 "produces": [
