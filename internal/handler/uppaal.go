@@ -7,7 +7,6 @@ import (
 	"github.com/boywei/go-zero-check/internal/util/json"
 	"github.com/boywei/go-zero-check/internal/util/response"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
 // Convert
@@ -21,21 +20,18 @@ import (
 func Convert(c *gin.Context) {
 	var content map[string]string
 	if err := c.BindJSON(&content); err != nil {
-		log.Errorln("JSON绑定错误: ", err)
-		response.RequestError(c, "JSON格式错误: "+err.Error())
+		response.ServiceError(c, "JSON格式错误: "+err.Error())
 		return
 	}
 
 	file := content["file"]
 	if file == "" {
-		log.Errorln("file为空")
-		response.RequestError(c, "file不能为空")
+		response.ServiceError(c, "file不能为空")
 		return
 	}
 
 	object, err := json.ConvertJson2Uppaal(file)
 	if err != nil {
-		log.Errorln("JSON解析错误: ", err)
 		response.ServiceError(c, "JSON解析错误: "+err.Error())
 		return
 	}
@@ -44,7 +40,6 @@ func Convert(c *gin.Context) {
 	modelName := "model" + strings.ReplaceAll(c.ClientIP(), ".", "_")
 	err = service.Convert(modelName, object)
 	if err != nil {
-		log.Errorln("模型转化错误: ", err)
 		response.ServiceError(c, "模型转化错误"+err.Error())
 		return
 	}
@@ -65,13 +60,11 @@ func DeleteModel(c *gin.Context) {
 	c.BindJSON(&content)
 	id := content["id"]
 	if id == "" {
-		log.Errorln("id为空")
-		response.RequestError(c, "id不能为空")
+		response.ServiceError(c, "id不能为空")
 		return
 	}
 	err := service.DeleteModelById(id)
 	if err != nil {
-		log.Errorln("删除模型失败: ", err)
 		response.ServiceError(c, "删除模型失败: "+err.Error())
 		return
 	}

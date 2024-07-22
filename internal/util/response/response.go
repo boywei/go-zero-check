@@ -1,6 +1,7 @@
 package response
 
 import (
+	log "github.com/sirupsen/logrus"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -20,10 +21,12 @@ func Success(c *gin.Context, data interface{}) {
 
 // RequestError 请求失败
 func RequestError(c *gin.Context, errorMsg string) {
+	log.Errorln(errorMsg)
 	c.JSON(http.StatusBadRequest, Response{Code: -1, Message: errorMsg, Data: nil})
 }
 
 // ServiceError 业务错误
 func ServiceError(c *gin.Context, errorMsg string) {
+	log.Errorln(errorMsg)
 	c.JSON(http.StatusOK, Response{Code: -1, Message: errorMsg, Data: nil})
 }

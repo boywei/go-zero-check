@@ -37,7 +37,7 @@ func Step(c *gin.Context) {
 	c.BindJSON(&content)
 	id := content["id"]
 	if id == "" {
-		response.RequestError(c, "模型id不能为空")
+		response.ServiceError(c, "模型id不能为空")
 		return
 	}
 	// 先选择自动机，再选择该自动机可选的参数，再运行得到下一步；

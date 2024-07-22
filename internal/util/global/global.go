@@ -16,7 +16,8 @@ type Model struct {
 }
 
 var (
-	ModelIdMap = make(map[string]*Model)
+	ModelIdMap        = make(map[string]*Model)
+	propertyResultMap = make(map[string]string)
 )
 
 // RemoveDir 删除当前model时释放资源
@@ -53,9 +54,14 @@ func (model *Model) Run() {
 
 // Check 检查模型是否满足性质
 func (model *Model) Check(property string) (string, error) {
+	// 检验是否在propertyResultMap中, 在的话直接取值
+	if result, ok := propertyResultMap[model.Name+property]; ok {
+		return result, nil
+	}
 	// TODO: 检查性质是否成立
 	a, b := rand.Float64(), rand.Float64()
 	min, max := math.Min(a, b), math.Max(a, b)
 	result := fmt.Sprintf("[%f, %f]", min, max)
+	propertyResultMap[model.Name+property] = result
 	return result, nil
 }
