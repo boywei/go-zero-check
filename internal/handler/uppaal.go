@@ -40,7 +40,7 @@ func Convert(c *gin.Context) {
 	modelName := "model" + strings.ReplaceAll(c.ClientIP(), ".", "_")
 	err = service.Convert(modelName, object)
 	if err != nil {
-		response.ServiceError(c, "模型转化错误"+err.Error())
+		response.ServiceError(c, "模型转化错误: "+err.Error())
 		return
 	}
 

@@ -1,5 +1,6 @@
 package model127_0_0_1
 
+//自动机的参数
 var id int
 
 var (

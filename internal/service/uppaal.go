@@ -16,25 +16,31 @@ import (
 func Convert(modelName string, object *model.Uppaal) error {
 	// 生成模型目录
 	modelPath := filepath.Join("demo", modelName)
+	if _, err := os.Stat(modelPath); err == nil {
+		// 目录存在，删除目录及其内容
+		if err := os.RemoveAll(modelPath); err != nil {
+			return errors.Wrap(err, "删除旧目录失败")
+		}
+	}
 	if err := os.MkdirAll(modelPath, os.ModePerm); err != nil {
-		return errors.Wrap(err, "make directory failed")
+		return errors.Wrap(err, "生成模型目录失败")
 	}
 
 	// 生成define.go文件
 	src, dest := filepath.Join("demo", "define.txt"), filepath.Join(modelPath, "define.go")
 	if err := copyFile(src, dest, modelName); err != nil {
-		return errors.Wrap(err, "copy file failed")
+		return errors.Wrap(err, "生成define.go文件失败")
 	}
 
 	// 生成declaration.go文件
 	if err := generateDeclarationFile(modelPath, modelName, object.Declaration); err != nil {
-		return errors.Wrap(err, "generate declaration file failed")
+		return errors.Wrap(err, "生成declaration.go文件失败")
 	}
 
 	// 生成<automaton>.go文件
 	for _, automaton := range object.Automatons {
 		if err := generateAutomatonFile(modelPath, modelName, automaton); err != nil {
-			return errors.Wrap(err, "generate automaton file failed")
+			return errors.Wrap(err, "生成<automaton>.go文件失败")
 		}
 	}
 
@@ -47,7 +53,7 @@ func Convert(modelName string, object *model.Uppaal) error {
 
 	// 运行模型
 	if _, err := cmd.RunStaticCode(modelName); err != nil {
-		return errors.Wrap(err, "run model failed")
+		return errors.Wrap(err, "运行模型失败")
 	}
 
 	return nil
@@ -57,24 +63,24 @@ func Convert(modelName string, object *model.Uppaal) error {
 func copyFile(src, dst, modelName string) error {
 	sourceFile, err := os.Open(src)
 	if err != nil {
-		return errors.Wrap(err, "open file failed")
+		return errors.Wrap(err, "打开文件失败")
 	}
 	defer sourceFile.Close()
 
 	destinationFile, err := os.Create(dst)
 	if err != nil {
-		return errors.Wrap(err, "create define file failed")
+		return errors.Wrap(err, "创建文件失败")
 	}
 	defer destinationFile.Close()
 	// 添加包名
 	_, err = destinationFile.WriteString("package " + modelName + "\n\n")
 	if err != nil {
-		return errors.Wrap(err, "write to define file failed")
+		return errors.Wrap(err, "写入文件失败")
 	}
 	// 使用io.Copy复制文件
 	_, err = io.Copy(destinationFile, sourceFile)
 	if err != nil {
-		return errors.Wrap(err, "copy to destination file failed")
+		return errors.Wrap(err, "复制文件失败")
 	}
 	return nil
 }
@@ -107,7 +113,10 @@ func generateAutomatonFile(modelPath, modelName string, automaton model.Automato
 	}
 	builder.WriteString("package " + modelName + "\n\n")
 	// TODO: 修改声明的方式，根据parameter来声明
-	builder.WriteString("var " + string(automaton.Parameters) + "\n\n")
+	if automaton.Parameters != "" {
+		builder.WriteString("//自动机的参数\n")
+		builder.WriteString("var " + string(automaton.Parameters) + "\n\n")
+	}
 	builder.WriteString("var (\n\t" + automaton.Name + " = &Automaton{\n")
 	builder.WriteString("\t\tName: \"" + automaton.Name + "\",\n")
 
@@ -134,7 +143,9 @@ func generateAutomatonFile(modelPath, modelName string, automaton model.Automato
 		builder.WriteString("\t\t\t\tDestinationId: " + strconv.Itoa(transition.DestinationId) + ",\n")
 		builder.WriteString("\t\t\t\tSelect: \"" + transition.Select + "\",\n")
 		builder.WriteString("\t\t\t\tGuard: func() bool {\n\t\t\t\t\treturn " + getValue(transition.Guard) + "\n\t\t\t\t},\n")
-		builder.WriteString("\t\t\t\tSync: func() bool {\n\t\t\t\t\treturn " + getValue(transition.Sync) + "\n\t\t\t\t},\n")
+		//builder.WriteString("\t\t\t\tSync: func() bool {\n\t\t\t\t\treturn " + getValue(transition.Sync) + "\n\t\t\t\t},\n")
+		// TODO: 为了解决sync的问题，暂时将sync的值设置为true
+		builder.WriteString("\t\t\t\tSync: func() bool {\n\t\t\t\t\treturn true\n\t\t\t\t},\n")
 		builder.WriteString("\t\t\t\tUpdate: func() {\n\t\t\t\t\t" + transition.Update + "\n\t\t\t\t},\n")
 		builder.WriteString("\t\t\t},\n")
 	}
