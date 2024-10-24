@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	kind2Url = "http://localhost:8081/"
+	kind2Url    = "http://localhost:8081/synlong/check"
 	contentType = "application/json"
 )
 
@@ -31,7 +31,7 @@ func CheckDataflow(file string) (string, error) {
 }
 
 // ConvertStateMachine 状态机转换
-func ConvertStateMachine(file string) (string,error) {
+func ConvertStateMachine(file string) (string, error) {
 	// TODO: 解析SynLong -> JSON
 	// 出bug了, 以下写死
 	// example0: 语法错误或不含状态机

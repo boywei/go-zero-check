@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/boywei/go-zero-check/internal/service"
 	"github.com/boywei/go-zero-check/internal/util/global"
 	"github.com/boywei/go-zero-check/internal/util/response"
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,7 @@ func Verify(c *gin.Context) {
 	}
 
 	// 获取验证结果
-	result, err := model.Check(property)
+	result, err := service.Check(model, property)
 	if err != nil {
 		response.ServiceError(c, "模型验证失败: "+err.Error())
 		return
