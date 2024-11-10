@@ -1,6 +1,7 @@
 package response
 
 import (
+	log "github.com/sirupsen/logrus"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,21 +14,19 @@ type Response struct {
 	Data    interface{} `json:"data,omitempty" swaggertype:"string" example:"{}"` // 数据
 }
 
-// New 响应
-func New(errCode *ErrCode, data interface{}) *Response {
-	return &Response{
-		Code:    errCode.Code,
-		Message: errCode.Message,
-		Data:    data,
-	}
-}
-
 // Success 请求成功
 func Success(c *gin.Context, data interface{}) {
-	c.JSON(http.StatusOK, New(SuccessResp, data))
+	c.JSON(http.StatusOK, Response{Code: 200, Message: "SUCCESS", Data: data})
 }
 
-// Failure 请求失败
-func Failure(c *gin.Context, errCode *ErrCode) {
-	c.JSON(http.StatusOK, errCode)
+// RequestError 请求失败
+func RequestError(c *gin.Context, errorMsg string) {
+	log.Errorln(errorMsg)
+	c.JSON(http.StatusBadRequest, Response{Code: -1, Message: errorMsg, Data: nil})
+}
+
+// ServiceError 业务错误
+func ServiceError(c *gin.Context, errorMsg string) {
+	log.Errorln(errorMsg)
+	c.JSON(http.StatusOK, Response{Code: -1, Message: errorMsg, Data: nil})
 }

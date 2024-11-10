@@ -1,3 +1,3 @@
 package test
 
-//Place global declarations here.
+// 在这里编写全局变量、函数等.

@@ -1,193 +1,256 @@
 grammar Synlong;
 
-program: (typedef | constant | node | function)* EOF;
+program     : decls* ;
 
-typedef: 'type' ID '=' topLevelType ';';
+// Declarations
 
-constant: 'const' ID (':' type)? '=' expr ';';
+decls       : type_block
+            | const_block
+            | user_op_decl
+            ;
 
-node:
-  'node' ID '(' input=varDeclList? ')'
-  'returns' '(' output=varDeclList? ')'
-  ('var' local=varDeclList ';')?
-  'let'
-    (equation | property | assertion | main | realizabilityInputs | ivc | stateMachine)*
-  'tel' ';'?
-;
+type_block  : 'type' type_decl ( ';' type_decl )* ;
 
-function:
-  'function' eID '(' input=varDeclList? ')'
-  'returns' '(' output=varDeclList? ')' ';'
-;
+type_decl   : ID ( '=' type_def )? ;
 
-varDeclList: varDeclGroup (';' varDeclGroup)*;
+type_def    : type_expr
+            | 'enum' '{' ID ( ID )* '}'
+            ;
 
-varDeclGroup: eID (',' eID)* ':' type;
+type_expr   : 'bool'
+            | 'char'
+            | 'byte'
+            | 'ubyte'
+            | 'short'
+            | 'ushort'
+            | 'int'
+            | 'uint'
+            | 'long'
+            | 'ulong'
+            | 'float'
+            | 'real'
+            | typevar
+            | '{' field_decl ( field_decl )* '}'
+            | type_expr '^' const_expr
+            ;
 
-topLevelType: type                                       # plainType
-    | 'struct' '{' (ID ':' type) (';' ID ':' type)* '}'  # recordType
-    | 'enum' '{' ID (',' ID)* '}'                        # enumType
-    ;
+field_decl  : ID ':' type_expr ;
 
-type: 'int'                                              # intType
-    | 'subrange' '[' bound ',' bound ']' 'of' 'int'      # subrangeType
-    | 'bool'                                             # boolType
-    | 'real'                                             # realType
-    | type '[' INT ']'                                   # arrayType
-    | ID                                                 # userType
-    ;
+typevar     : ID ;
 
-bound: '-'? INT;
+// Constant Block
 
-// 4.5.3 状态机
-stateMachine: 'automaton' ID stateDecl*;
+const_block : 'const' const_decl ( ';' const_decl )* ;
 
-stateDecl:
-  'initial'? 'final'? 'state' ID
-  ('unless' (transition ';')+)?
-  dataDef
-  ('until' (transition ';')*
-  ('synchro' actions? 'fork' ';')?)?
-;
+const_decl  : ID ':' type_expr ( '=' const_expr )? ;
 
-transition: 'if' expr arrow;
+const_expr  : ID
+            | atom
+            | unary_arith_op const_expr
+            | const_expr bin_arith_op const_expr
+            | const_expr bin_bool_op const_expr
+            | const_expr bin_relation_op const_expr
+            | '[' const_list ']'
+            | '{' const_label_expr ( const_label_expr )* '}'
+            ;
 
-arrow: actions? fork;
+const_list  : const_expr ( const_expr )* ;
 
-fork: target
-  | 'if' expr arrow elsifFork* elseFork?
-;
+const_label_expr : ID ':' const_expr ;
 
-elsifFork: 'elsif' expr arrow;
+// User Operation Declaration
 
-elseFork: 'else' arrow;
+user_op_decl : op_kind ID params returns_clause op_body ;
 
-target: 'restart' ID
-  | 'resume' ID
-;
+op_kind     : 'function'
+            | 'node'
+            ;
 
-actions: 'do' dataDef
-  | 'do' '{' 'emit'? emissionBody (';' 'emit' emissionBody)* '}'
-;
+params      : '(' ( var_decls ( ';' var_decls )* )? ')' ;
 
-dataDef: equation | scope;
+returns_clause : 'returns' params ;
 
-scope: localBlock? eqs?;
+op_body     : ';'
+            | ( local_block )? 'let' ( equation ';' )* 'tel' ';'? ;
 
-localBlock: 'var' (varDecl ';')*;
+local_block : 'var' ( var_decls ';' )* ;
 
-eqs: 'let' (equation ';')* 'tel';
+// Variable Declarations
 
-varDecl: varID (',' varID)* ':' type
-//  whenDecl?
-  defaultDecl?
-  lastDecl?
-;
+var_decls   : var_id ( var_id )* ':' type_expr ( when_decl )? ( last_decl )? ;
 
-varID: 'clock'? ID;
+var_id      : ID ;
 
-//whenDecl: 'when' clockExpr;
+when_decl   : 'when' clock_expr ;
 
-defaultDecl: 'default' '=' expr;
+clock_expr  : ID
+            | 'not' ID
+            ;
 
-lastDecl: 'last' '=' expr;
+last_decl   : 'last' '=' const_expr ;
 
-property: '--%PROPERTY' eID ';';
+// Equations
 
-realizabilityInputs: '--%REALIZABLE' (ID (',' ID)*)? ';';
+equation    : lhs '=' expr
+            | state_machine return_statement
+            ;
 
-ivc: '--%IVC' (eID (',' eID)*)? ';';
+lhs         : '(' ')'
+            | lhs_id ( lhs_id )*
+            ;
 
-main: '--%MAIN' ';'?;
+lhs_id      : ID ;
 
-assertion: 'assert' expr ';';
+return_statement : 'returns' returns_var ;
 
-// 4.5.1 等式
-//equation: (lhs | '(' lhs? ')') '=' expr ';';
-equation: simpleEquation
-  | emission
-  | controlBlock return
-;
+returns_var : ( ID )+ ;
 
-simpleEquation: lhs '=' expr;
+// State Machine
 
-lhs: '(' ')'
-  | lhsID (',' lhsID)*
-;
+state_machine : 'automaton' ( ID )? state_decl+ ;
 
-lhsID: eID | '_';
+state_decl   : ( 'initial' )? ( 'final' )? 'state' ID ( 'unless' transition ( ';' transition )* )? data_def ( 'until' transition ( ';' transition )* )? ;
 
-controlBlock: stateMachine | clockedBlock;
+data_def     : equation ';'
+            | ( local_block )? 'let' ( equation ';' )* 'tel'
+            ;
 
-emission: 'emit' emissionBody;
+transition   : 'if' expr ( 'resume' | 'restart' ) ID ;
 
-emissionBody: eID ('if' expr)?
-  | '(' eID (',' eID)* ')' ('if' expr)?
-;
+// Expressions
 
-return: 'returns' returnVar ';';
+expr        : simple_expr
+            | 'last' '\'' ID
+            | tempo_expr
+            | bool_expr
+            | array_expr
+            | struct_expr
+            | mixed_constructor
+            | switch_expr
+            | apply_expr
+            ;
 
-returnVar: (eID ',')* (eID | '..');
+simple_expr : ID
+            | atom
+            | simple_expr '[' const_expr ']'
+            | simple_expr '.' ID
+            | unary_arith_op simple_expr
+            | simple_expr bin_arith_op simple_expr
+            | simple_expr bin_bool_op simple_expr
+            | simple_expr bin_relation_op simple_expr
+            | '(' type_expr simple_expr ')'
+            ;
 
-// 4.5.2 条件块
-clockedBlock: 'activate' eID (ifBlock | matchBlock);
+tempo_expr  : 'pre' simple_expr
+            | simple_expr '->' simple_expr
+            | 'fby' '(' simple_expr ';' const_expr ';' simple_expr ')'
+            | simple_expr 'fby' simple_expr
+            | simple_expr 'when' clock_expr
+            | 'merge' ID '(' simple_expr ',' simple_expr ')'
+            ;
 
-ifBlock: 'if' expr 'then' (dataDef | ifBlock)
-  'else' (dataDef | ifBlock)
-;
+bool_expr   : '#' '(' list ')'
+            ;
 
-matchBlock: 'when' expr 'match' ('|' pattern ':' dataDef)+;
+array_expr  : simple_expr '[' INTEGER '..' INTEGER ']'
+            | '(' simple_expr '.' ( index )+ 'default' simple_expr ')'
+            | simple_expr '^' const_expr
+            | '[' list ']'
+            ;
 
-pattern: ID
-  | INT
-  | REAL
-  | BOOL
-;
+struct_expr : '{' label_expr ( label_expr )* '}'
+            ;
 
-expr: ID                                                       # idExpr
-    | INT                                                      # intExpr
-    | REAL                                                     # realExpr
-    | BOOL                                                     # boolExpr
-    | op=('real' | 'floor') '(' expr ')'                       # castExpr
-    | eID '(' (expr (',' expr)*)? ')'                          # callExpr
-    | 'condact' '(' expr (',' expr)+ ')'                       # condactExpr
-    | expr '.' ID                                              # recordAccessExpr
-    | expr '{' ID ':=' expr '}'                                # recordUpdateExpr
-    | expr '[' expr ']'                                        # arrayAccessExpr
-    | expr '[' expr ':=' expr ']'                              # arrayUpdateExpr
-    | 'pre' expr                                               # preExpr
-    | 'not' expr                                               # notExpr
-    | '-' expr                                                 # negateExpr
-    | expr op=('*' | '/' | 'div' | 'mod') expr                 # binaryExpr
-    | expr op=('+' | '-') expr                                 # binaryExpr
-    | expr op=('<' | '<=' | '>' | '>=' | '=' | '<>') expr      # binaryExpr
-    | expr op='and' expr                                       # binaryExpr
-    | expr op=('or' | 'xor') expr                              # binaryExpr
-    | <assoc=right> expr op='=>' expr                          # binaryExpr
-    | <assoc=right> expr op='->' expr                          # binaryExpr
-    | 'if' expr 'then' expr 'else' expr                        # ifThenElseExpr
-    | ID '{' ID '=' expr (';' ID '=' expr)* '}'                # recordExpr
-    | '[' expr (',' expr)* ']'                                 # arrayExpr
-    | '(' expr (',' expr)* ')'                                 # tupleExpr
-    ;
+label_expr  : ID ':' simple_expr
+            ;
 
-// eID used internally. Users should only use ID.
-eID: ID                                                        # baseEID
-   | eID '[' INT ']'                                           # arrayEID
-   | eID '.' ID                                                # recordEID
-   ;
+mixed_constructor : '(' ID 'with' ( label_or_index )+ '=' simple_expr ')'
+            ;
 
-REAL: INT '.' INT;
+label_or_index : '.' ID
+               | index
+               ;
 
-BOOL: 'true' | 'false';
-INT: [0-9]+;
+index       : '[' simple_expr ']'
+            ;
 
-// ~ is used internally. Users should not use it.
-ID: [a-zA-Z_~!][a-zA-Z_0-9~!]*;
+switch_expr : 'if' simple_expr 'then' simple_expr 'else' simple_expr
+            | '(' 'case' simple_expr 'of' ( case_expr )+ ')'
+            ;
 
-WS: [ \t\n\r\f]+ -> skip;
+case_expr   : '|' pattern ':' simple_expr
+            ;
 
-SL_COMMENT: '--' (~[%\n\r] ~[\n\r]* | /* empty */) ('\r'? '\n')? -> skip;
-ML_COMMENT: '(*' .*? '*)' -> skip;
+pattern     : ID
+            | CHAR
+            | '-'? INTEGER
+            | 'true'
+            | 'false'
+            | '_'
+            ;
 
-ERROR: .;
+apply_expr  : prefix_operator '(' list ')'
+            | '(' iterator '<<' prefix_operator ';' const_expr '>>' ')' '(' list ')'
+            | '(' 'mapw' '<<' prefix_operator ';' const_expr '>>' 'if' simple_expr 'default' '(' list ')' ')' '(' list ')'
+            | '(' 'mapwi' '<<' prefix_operator ';' const_expr '>>' 'if' simple_expr 'default' '(' list ')' ')' '(' list ')'
+            | '(' 'foldw' '<<' prefix_operator ';' const_expr '>>' 'if' simple_expr ')' '(' list ')'
+            | '(' 'foldwi' '<<' prefix_operator ';' const_expr '>>' 'if' simple_expr ')' '(' list ')'
+            ;
+
+prefix_operator : ID
+                | prefix_unary_operator
+                | prefix_binary_operator
+                | '(make' ID ')'
+                | '(flatten' ID ')'
+                ;
+
+prefix_unary_operator : '+$' | '-$' | 'not$' | 'short$' | 'int$' | 'float$' | 'real$' ;
+
+prefix_binary_operator : '$+$' | '$-$' | '$*$' | '$/$' | '$mod$' | '$div$'
+                       | '$=$' | '$<>$' | '$<$' | '$>$' | '$<=$' | '$>=$'
+                       | '$and$' | '$or$' | '$xor$'
+                       ;
+
+iterator    : 'map' | 'fold' | 'mapi' | 'foldi' | 'mapfold' ;
+
+list        : ( simple_expr ( simple_expr )* )? ;
+
+// Operators
+
+unary_arith_op : '-' | '+' | 'not' ;
+
+bin_arith_op  : '+' | '-' | '*' | '/' | 'mod' | 'div' ;
+
+bin_relation_op : '=' | '<>' | '<' | '>' | '<=' | '>=' ;
+
+bin_bool_op   : 'and' | 'or' | 'xor' ;
+
+// Atoms
+
+atom        : 'true'
+            | 'false'
+            | CHAR
+            | INTEGER
+            | UINT
+            | FLOAT
+            | REAL
+            | USHORT
+            | SHORT
+            ;
+
+// Comments
+
+COMMENT: '--' (~[%\n\r] ~[\n\r]* | /* empty */) ('\r'? '\n')? -> skip;
+
+// Lexer rules
+
+ID          : [a-zA-Z_] [a-zA-Z_0-9]* ;
+CHAR        : '\'' . '\'' ;
+INTEGER     : '0' | [1-9] [0-9]* ;
+UINT        : INTEGER 'u' ;
+FLOAT       : [0-9]+ '.' [0-9]* ('e' [+-]? [0-9]+)? 'f' ;
+REAL        : [0-9]+ '.' [0-9]* ('e' [+-]? [0-9]+)? ;
+USHORT      : INTEGER 'us' ;
+SHORT       : INTEGER 's' ;
+
+WS          : [ \t\r\n]+ -> skip ;

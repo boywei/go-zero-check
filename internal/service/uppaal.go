@@ -1,213 +1,169 @@
 package service
 
 import (
-	"fmt"
-	"github.com/google/uuid"
+	"github.com/boywei/go-zero-check/internal/model"
+	"github.com/boywei/go-zero-check/internal/util/cmd"
+	"github.com/boywei/go-zero-check/internal/util/global"
+	"github.com/pkg/errors"
+	"github.com/traefik/yaegi/interp"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
-
-	"github.com/boywei/go-zero-check/internal/util/cmd"
-
-	"github.com/boywei/go-zero-check/internal/util/global"
-	"github.com/boywei/go-zero-check/internal/util/json"
-	"github.com/boywei/go-zero-check/internal/util/response"
-	log "github.com/sirupsen/logrus"
-	"github.com/traefik/yaegi/interp"
-
-	"github.com/gin-gonic/gin"
 )
 
-// Convert
-//
-//	@Tags		编辑器, Main
-//	@Summary	前端传过来的JSON转Go对象
-//	@Param		file	body	string	true	"JSON file"
-//	@Produce	json
-//	@Success	200	{object}	response.Response
-//	@Failure	400	{object}	response.ErrCode
-//	@Router		/model/convert [post]
-func Convert(c *gin.Context) {
-	content := make(map[string]string)
-	c.BindJSON(&content)
-	file := content["file"]
-	if file == "" {
-		log.Errorln("Empty file")
-		response.Failure(c, response.InvalidParam)
-		return
-	}
-	object, err := json.ConvertJson2Uppaal(file)
-	if err != nil {
-		log.Errorln("JSON decode error: ", err)
-		response.Failure(c, response.InvalidParam)
-		return
-	}
-
-	system := os.Getenv("GOOS")
-
-	// 0. 新建模型目录, 拷贝define文件
-	modelName := "test"
-	modelPath := "demo/" + modelName + "/"
-	if system == "windows" {
-		modelPath = "demo\\" + modelName + "\\"
-	}
-	err = os.Mkdir(modelPath, os.ModePerm)
-	if err != nil {
-		if os.IsExist(err) { // 当前目录已经存在, 那么清空
-			_ = os.RemoveAll(modelPath)
-			_ = os.Mkdir(modelPath, os.ModePerm)
-		} else { // 其他错误
-			log.Errorln("Mkdir err: ", err)
-			response.Failure(c, response.ModelConvertErr)
-			return
+func Convert(modelName string, object *model.Uppaal) error {
+	// 生成模型目录
+	modelPath := filepath.Join("demo", modelName)
+	if _, err := os.Stat(modelPath); err == nil {
+		// 目录存在，删除目录及其内容
+		if err := os.RemoveAll(modelPath); err != nil {
+			return errors.Wrap(err, "删除旧目录失败")
 		}
 	}
-
-	// 复制define.go文件到模型目录下
-	sourceFile, err := os.Open("demo/define.txt")
-	if system == "windows" {
-		sourceFile, err = os.Open("demo\\define.txt")
-	}
-	if err != nil {
-		panic(err)
-	}
-	defer sourceFile.Close()
-
-	destinationFile, err := os.Create("demo/" + modelName + "/define.go")
-	if system == "windows" {
-		destinationFile, err = os.Create("demo\\" + modelName + "\\define.go")
-	}
-	if err != nil {
-		panic(err)
-	}
-	defer destinationFile.Close()
-
-	// 添加包名
-	_, err = destinationFile.WriteString("package " + modelName + "\n\n")
-	if err != nil {
-		fmt.Printf("写入目标文件失败: %v\n", err)
-		return
-	}
-	// 使用io.Copy复制文件
-	_, err = io.Copy(destinationFile, sourceFile)
-	if err != nil {
-		panic(err)
+	if err := os.MkdirAll(modelPath, os.ModePerm); err != nil {
+		return errors.Wrap(err, "生成模型目录失败")
 	}
 
-	// 1. 处理Declaration -> 生成declaration.go文件
-	df, err := os.Create(modelPath + "declaration.go")
-	defer df.Close()
-	if err != nil {
-		log.Errorln("Create declaration file err: ", err)
-		response.Failure(c, response.ModelConvertErr)
-		return
+	// 生成define.go文件
+	src, dest := filepath.Join("demo", "define.txt"), filepath.Join(modelPath, "define.go")
+	if err := copyFile(src, dest, modelName); err != nil {
+		return errors.Wrap(err, "生成define.go文件失败")
 	}
-	_, err = df.WriteString("package " + modelName + "\n\n" + string(object.Declaration))
-	if err != nil {
-		log.Errorln("Write global declaration err: ", err)
-		response.Failure(c, response.ModelConvertErr)
-		return
+
+	// 生成declaration.go文件
+	if err := generateDeclarationFile(modelPath, modelName, object.Declaration); err != nil {
+		return errors.Wrap(err, "生成declaration.go文件失败")
 	}
-	// 2. 处理Automatons -> 针对每个自动机，生成<automaton_name>.go文件
+
+	// 生成<automaton>.go文件
 	for _, automaton := range object.Automatons {
-		// 用一个builder来拼接所有的内容
-		var builder strings.Builder
-
-		// 1) name string
-		f, err := os.Create(modelPath + automaton.Name + ".go")
-		defer f.Close()
-		if err != nil {
-			log.Errorln("Handle automaton err: ", err)
-			response.Failure(c, response.ModelConvertErr)
-			return
-		}
-		builder.WriteString("package " + modelName + "\n\n")
-		// TODO 修改声明的方式，根据parameter来声明
-		builder.WriteString("var " + string(automaton.Parameters) + "\n\n")
-		builder.WriteString("var (\n\t" + automaton.Name + " = &Automaton{\n")
-		builder.WriteString("\t\tName: \"" + automaton.Name + "\",\n")
-
-		// 2) Parameters  []Parameter
-		//builder.WriteString("\t\tParameters: []string{\n")
-		//for _, parameter := range automaton.Parameters {
-		//	builder.WriteString("\t\t\t\"" + string(parameter) + "\",\n")
-		//}
-		//builder.WriteString("\t\t},\n")
-
-		// 2) Parameters  Parameter
-		builder.WriteString("\t\tParameters: \"" + string(automaton.Parameters) + "\",\n")
-
-		// 3) Locations   []Location
-		builder.WriteString("\t\tLocations: []Location{\n")
-		for _, location := range automaton.Locations {
-			builder.WriteString("\t\t\t{\n")
-			builder.WriteString("\t\t\t\tId: " + strconv.Itoa(location.Id) + ",\n")
-			builder.WriteString("\t\t\t\tName: \"" + location.Name + "\",\n")
-			builder.WriteString("\t\t\t\tInvariant: func() bool {\n\t\t\t\t\treturn " + getValue(location.Invariant) + "\n\t\t\t\t},\n")
-			builder.WriteString("\t\t\t},\n")
-		}
-		builder.WriteString("\t\t},\n")
-
-		// 4) Transitions []Transition
-		builder.WriteString("\t\tTransitions: []Transition{\n")
-		for _, transition := range automaton.Transitions {
-			builder.WriteString("\t\t\t{\n")
-			builder.WriteString("\t\t\t\tId: " + strconv.Itoa(transition.Id) + ",\n")
-			builder.WriteString("\t\t\t\tSourceId: " + strconv.Itoa(transition.SourceId) + ",\n")
-			builder.WriteString("\t\t\t\tDestinationId: " + strconv.Itoa(transition.DestinationId) + ",\n")
-			builder.WriteString("\t\t\t\tSelect: \"" + transition.Select + "\",\n")
-			builder.WriteString("\t\t\t\tGuard: func() bool {\n\t\t\t\t\treturn " + getValue(transition.Guard) + "\n\t\t\t\t},\n")
-			builder.WriteString("\t\t\t\tSync: func() bool {\n\t\t\t\t\treturn " + getValue(transition.Sync) + "\n\t\t\t\t},\n")
-			builder.WriteString("\t\t\t\tUpdate: func() {\n\t\t\t\t\t" + transition.Update + "\n\t\t\t\t},\n")
-			builder.WriteString("\t\t\t},\n")
-		}
-		builder.WriteString("\t\t},\n")
-
-		// 5) Init        Location
-		builder.WriteString("\t\tInit: " + strconv.Itoa(automaton.Init) + ",\n")
-		builder.WriteString("\t}\n\n")
-		builder.WriteString(")\n\n")
-		// 6) Declarations Declaration
-		builder.WriteString(string(automaton.Declaration))
-
-		// 将builder的内容写入文件
-		_, err = f.WriteString(builder.String())
-		if err != nil {
-			log.Errorln("Write automaton err: ", err)
-			response.Failure(c, response.ModelConvertErr)
-			return
+		if err := generateAutomatonFile(modelPath, modelName, automaton); err != nil {
+			return errors.Wrap(err, "生成<automaton>.go文件失败")
 		}
 	}
 
-	// 3. 处理SystemDeclaration: 执行该语句(执行方式待考量) ->
-
-	// 4. 使用解释器运行代码, 若无报错则保存声明后的Uppaal对象(使用同一redis缓存！), 并返回生成的uuid字符串
-	// 先保存id并返回新程序信息，再启动
-	//id, err := middleware.SetModel(object)
-	id := uuid.NewString()
-	if err != nil {
-		log.Errorln("Cache set model error: ", err)
-		response.Failure(c, response.ModelRunErr)
-		return
-	}
-	// 保存model的一些全局信息
-	global.ModelIdMap[id] = &global.Model{
+	// 保存模型, 添加到全局变量中, 生成模型的解释器
+	global.ModelIdMap[modelName] = &global.Model{
 		Name:        modelName,
 		Path:        modelPath,
 		Interpreter: interp.New(interp.Options{}),
 	}
-	if _, err = cmd.RunStaticCode(id); err != nil {
-		log.Errorln("Model run error: ", err)
-		response.Failure(c, response.ModelRunErr)
-		return
+
+	// 运行模型
+	if _, err := cmd.RunStaticCode(modelName); err != nil {
+		return errors.Wrap(err, "运行模型失败")
 	}
 
-	// TODO: 5. 解析相关source/target/init
+	return nil
+}
 
-	response.Success(c, gin.H{
-		"id": id,
-	})
+// copyFile 复制文件, 并添加package name到文件头部.
+func copyFile(src, dst, modelName string) error {
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return errors.Wrap(err, "打开文件失败")
+	}
+	defer sourceFile.Close()
+
+	destinationFile, err := os.Create(dst)
+	if err != nil {
+		return errors.Wrap(err, "创建文件失败")
+	}
+	defer destinationFile.Close()
+	// 添加包名
+	_, err = destinationFile.WriteString("package " + modelName + "\n\n")
+	if err != nil {
+		return errors.Wrap(err, "写入文件失败")
+	}
+	// 使用io.Copy复制文件
+	_, err = io.Copy(destinationFile, sourceFile)
+	if err != nil {
+		return errors.Wrap(err, "复制文件失败")
+	}
+	return nil
+}
+
+// generateDeclarationFile 生成declaration文件
+func generateDeclarationFile(modelPath, modelName string, declaration model.Declaration) error {
+	file, err := os.Create(filepath.Join(modelPath, "declaration.go"))
+	defer file.Close()
+	if err != nil {
+		return errors.Wrap(err, "创建文件失败")
+	}
+	// 添加包名
+	_, err = file.WriteString("package " + modelName + "\n\n" + string(declaration))
+	if err != nil {
+		return errors.Wrap(err, "写入文件失败")
+	}
+	return nil
+}
+
+// generateAutomatonFile 处理Automatons -> 针对每个自动机，生成<automaton_name>.go文件
+func generateAutomatonFile(modelPath, modelName string, automaton model.Automaton) error {
+	// 用一个builder来拼接所有的内容
+	var builder strings.Builder
+
+	// 1) name string
+	f, err := os.Create(filepath.Join(modelPath, automaton.Name+".go"))
+	defer f.Close()
+	if err != nil {
+		return errors.Wrap(err, "创建文件失败")
+	}
+	builder.WriteString("package " + modelName + "\n\n")
+	// TODO: 修改声明的方式，根据parameter来声明
+	if automaton.Parameters != "" {
+		builder.WriteString("//自动机的参数\n")
+		builder.WriteString("var " + string(automaton.Parameters) + "\n\n")
+	}
+	builder.WriteString("var (\n\t" + automaton.Name + " = &Automaton{\n")
+	builder.WriteString("\t\tName: \"" + automaton.Name + "\",\n")
+
+	// 2) Parameters  Parameter
+	builder.WriteString("\t\tParameters: \"" + string(automaton.Parameters) + "\",\n")
+
+	// 3) Locations   []Location
+	builder.WriteString("\t\tLocations: []Location{\n")
+	for _, location := range automaton.Locations {
+		builder.WriteString("\t\t\t{\n")
+		builder.WriteString("\t\t\t\tId: " + strconv.Itoa(location.Id) + ",\n")
+		builder.WriteString("\t\t\t\tName: \"" + location.Name + "\",\n")
+		builder.WriteString("\t\t\t\tInvariant: func() bool {\n\t\t\t\t\treturn " + getValue(location.Invariant) + "\n\t\t\t\t},\n")
+		builder.WriteString("\t\t\t},\n")
+	}
+	builder.WriteString("\t\t},\n")
+
+	// 4) Transitions []Transition
+	builder.WriteString("\t\tTransitions: []Transition{\n")
+	for _, transition := range automaton.Transitions {
+		builder.WriteString("\t\t\t{\n")
+		builder.WriteString("\t\t\t\tId: " + strconv.Itoa(transition.Id) + ",\n")
+		builder.WriteString("\t\t\t\tSourceId: " + strconv.Itoa(transition.SourceId) + ",\n")
+		builder.WriteString("\t\t\t\tDestinationId: " + strconv.Itoa(transition.DestinationId) + ",\n")
+		builder.WriteString("\t\t\t\tSelect: \"" + transition.Select + "\",\n")
+		builder.WriteString("\t\t\t\tGuard: func() bool {\n\t\t\t\t\treturn " + getValue(transition.Guard) + "\n\t\t\t\t},\n")
+		//builder.WriteString("\t\t\t\tSync: func() bool {\n\t\t\t\t\treturn " + getValue(transition.Sync) + "\n\t\t\t\t},\n")
+		// TODO: 为了解决sync的问题，暂时将sync的值设置为true
+		builder.WriteString("\t\t\t\tSync: func() bool {\n\t\t\t\t\treturn true\n\t\t\t\t},\n")
+		builder.WriteString("\t\t\t\tUpdate: func() {\n\t\t\t\t\t" + transition.Update + "\n\t\t\t\t},\n")
+		builder.WriteString("\t\t\t},\n")
+	}
+	builder.WriteString("\t\t},\n")
+
+	// 5) Init        Location
+	builder.WriteString("\t\tInit: " + strconv.Itoa(automaton.Init) + ",\n")
+	builder.WriteString("\t}\n\n")
+	builder.WriteString(")\n\n")
+	// 6) Declarations Declaration
+	builder.WriteString(string(automaton.Declaration))
+
+	// 将builder的内容写入文件
+	_, err = f.WriteString(builder.String())
+	if err != nil {
+		return errors.Wrap(err, "写入文件失败")
+	}
+	return nil
 }
 
 // getValue 用于获取字符串（uppaal中的条件判断语句）的默认值true
@@ -218,101 +174,17 @@ func getValue(data string) string {
 	return data
 }
 
-// DeleteModel
-//
-//	@Tags		编辑器
-//	@Summary	删除一个模型
-//	@Param		id	body	string	true	"model's id"
-//	@Produce	json
-//	@Success	200	{object}	response.Response
-//	@Failure	400	{object}	response.ErrCode
-//	@Router		/model/delete [post]
-func DeleteModel(c *gin.Context) {
-	content := make(map[string]string)
-	c.BindJSON(&content)
-	id := content["id"]
-	if id == "" {
-		log.Errorln("Empty id")
-		response.Failure(c, response.InvalidParam)
-		return
-	}
-	err := global.DeleteModelById(id)
-	if err != nil {
-		response.Failure(c, response.ModelNotExist)
-		return
-	}
-	response.Success(c, nil)
-}
-
-// TestModel
-//
-//	@Tags		编辑器
-//	@Summary	测试代码是否生成成功, 返回输入整数的下一个整数
-//	@Param		id	query	string	true	"model's id"
-//	@Param		num	query	int		true	"number"
-//	@Produce	json
-//	@Success	200	{object}	response.Response
-//	@Failure	400	{object}	response.ErrCode
-//	@Router		/model/test [get]
-func TestModel(c *gin.Context) {
-	id := c.Query("id")
-	num := c.Query("num")
-	if id == "" || num == "" {
-		log.Errorln("Empty param")
-		response.Failure(c, response.InvalidParam)
-		return
-	}
-	value, err := strconv.Atoi(num)
-	if err != nil {
-		log.Errorln("Please input number")
-		response.Failure(c, response.InvalidParam)
-		return
-	}
-	model, ok := global.ModelIdMap[id]
+// DeleteModelById 根据id删除对应的模型
+func DeleteModelById(id string) error {
+	// 删除modelMap中的内容
+	m, ok := global.ModelIdMap[id]
 	if !ok {
-		log.Errorf("%s not exists\n", id)
-		response.Failure(c, response.ModelNotExist)
-		return
+		return errors.New("该id对应的模型不存在: " + id)
 	}
-	code := model.Name + "." + fmt.Sprintf("Add(%d, 1)", value)
-	result, err := cmd.RunCode(id, code)
+	err := m.RemoveDir()
 	if err != nil {
-		log.Errorln("Model run error: ", err)
-		response.Failure(c, response.ModelRunErr)
-		return
+		return errors.Wrap(err, "删除模型对应的目录失败")
 	}
-	response.Success(c, gin.H{
-		"result": fmt.Sprintf("%v", *result), // TODO: 返回结果的形式有待考量
-	})
-}
-
-// RunModel
-//
-//	@Tags		编辑器
-//	@Summary	运行一条语句(用于测试)
-//	@Param		id		body	string	true	"model's id"
-//	@Param		code	body	string	true	"code"
-//	@Produce	json
-//	@Success	200	{object}	response.Response
-//	@Failure	400	{object}	response.ErrCode
-//	@Router		/model/run [post]
-func RunModel(c *gin.Context) {
-	content := make(map[string]string)
-	c.BindJSON(&content)
-	id := content["id"]
-	code := content["code"]
-	if id == "" || code == "" {
-		log.Errorln("Empty param")
-		response.Failure(c, response.InvalidParam)
-		return
-	}
-	result, err := cmd.RunCode(id, code)
-	if err != nil {
-		log.Errorln("Model run error: ", err)
-		response.Failure(c, response.ModelRunErr)
-		return
-	}
-	response.Success(c, gin.H{
-		"result": fmt.Sprintf("%v", *result), // TODO: 返回结果的形式有待考量
-	})
+	delete(global.ModelIdMap, id)
+	return nil
 }

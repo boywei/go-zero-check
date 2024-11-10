@@ -5,7 +5,7 @@ import (
 	"runtime/debug"
 
 	"github.com/boywei/go-zero-check/docs"
-	"github.com/boywei/go-zero-check/internal/service"
+	"github.com/boywei/go-zero-check/internal/handler"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	swaggerfiles "github.com/swaggo/files"
@@ -26,38 +26,36 @@ func Router() *gin.Engine {
 	// 编辑器
 	model := r.Group("/model")
 	{
-		model.POST("/convert", service.Convert)
-		model.POST("/delete", service.DeleteModel)
-		model.GET("/test", service.TestModel)
-		model.POST("/run", service.RunModel)
+		model.POST("/convert", handler.Convert)
+		model.POST("/delete", handler.DeleteModel)
 	}
 
 	// lustre
 	lustre := r.Group("/lustre")
 	{
-		lustre.POST("/convert", service.ConvertLustre)
-		lustre.POST("/check-dataflow", service.CheckDataflow)
+		lustre.POST("/convert", handler.ConvertLustre)
+		lustre.POST("/check-dataflow", handler.CheckDataflow)
 	}
 
 	// 模拟器
 	simulator := r.Group("/simulator")
 	{
-		simulator.GET("/start", service.Start)
-		simulator.POST("/step", service.Step)
-		simulator.GET("/get-next", service.GetNext)
-		simulator.POST("/reset", service.Reset)
-		simulator.GET("/get-trace", service.GetTrace)
-		simulator.POST("/save-trace", service.SaveTrace)
-		simulator.POST("/open-trace", service.OpenTrace)
-		simulator.POST("/random-trace", service.RandomTrace)
-		simulator.GET("/get-global", service.GetGlobal)
-		simulator.GET("/get-local", service.GetLocal)
-		simulator.GET("/get-current-status", service.GetCurrentStatus)
-		simulator.GET("/get-sync", service.GetSync)
+		simulator.GET("/start", handler.Start)
+		simulator.POST("/step", handler.Step)
+		simulator.GET("/get-next", handler.GetNext)
+		simulator.POST("/reset", handler.Reset)
+		simulator.GET("/get-trace", handler.GetTrace)
+		simulator.POST("/save-trace", handler.SaveTrace)
+		simulator.POST("/open-trace", handler.OpenTrace)
+		simulator.POST("/random-trace", handler.RandomTrace)
+		simulator.GET("/get-global", handler.GetGlobal)
+		simulator.GET("/get-local", handler.GetLocal)
+		simulator.GET("/get-current-status", handler.GetCurrentStatus)
+		simulator.GET("/get-sync", handler.GetSync)
 	}
 
 	// 验证器
-	r.POST("/verify", service.Verify)
+	r.POST("/verify", handler.Verify)
 
 	return r
 }

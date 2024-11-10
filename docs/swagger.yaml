@@ -152,33 +152,6 @@ paths:
       summary: 运行一条语句(用于测试)
       tags:
       - 编辑器
-  /model/test:
-    get:
-      parameters:
-      - description: model's id
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: number
-        in: query
-        name: num
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/response.ErrCode'
-      summary: 测试代码是否生成成功, 返回输入整数的下一个整数
-      tags:
-      - 编辑器
   /simulator/get-current-status:
     get:
       parameters:

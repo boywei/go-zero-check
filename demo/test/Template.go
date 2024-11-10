@@ -21,6 +21,20 @@ var (
 					return true
 				},
 			},
+			{
+				Id: 3,
+				Name: "",
+				Invariant: func() bool {
+					return true
+				},
+			},
+			{
+				Id: 4,
+				Name: "",
+				Invariant: func() bool {
+					return true
+				},
+			},
 		},
 		Transitions: []Transition{
 			{
@@ -44,4 +58,4 @@ var (
 
 )
 
-// Place local declarations here.
+// 在这里编写局部变量、函数等.
