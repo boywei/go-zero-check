@@ -9,7 +9,8 @@ decls       : type_block
             | user_op_decl
             ;
 
-type_block  : 'type' type_decl ( ';' type_decl )* ;
+// 注意这里以后可能出错, 不是*(0~n)而是+(1~n)
+type_block  : 'type' ( type_decl ';' )* ;
 
 type_decl   : ID ( '=' type_def )? ;
 
@@ -30,7 +31,7 @@ type_expr   : 'bool'
             | 'float'
             | 'real'
             | typevar
-            | '{' field_decl ( field_decl )* '}'
+            | '{' field_decl ( ',' field_decl )* '}'
             | type_expr '^' const_expr
             ;
 
@@ -40,7 +41,8 @@ typevar     : ID ;
 
 // Constant Block
 
-const_block : 'const' const_decl ( ';' const_decl )* ;
+// 注意这里以后可能出错, 不是*(0~n)而是+(1~n)
+const_block : 'const' ( const_decl ';' )* ;
 
 const_decl  : ID ':' type_expr ( '=' const_expr )? ;
 
@@ -51,10 +53,10 @@ const_expr  : ID
             | const_expr bin_bool_op const_expr
             | const_expr bin_relation_op const_expr
             | '[' const_list ']'
-            | '{' const_label_expr ( const_label_expr )* '}'
+            | '{' const_label_expr ( ',' const_label_expr )* '}'
             ;
 
-const_list  : const_expr ( const_expr )* ;
+const_list  : const_expr ( ',' const_expr )* ;
 
 const_label_expr : ID ':' const_expr ;
 
@@ -248,8 +250,8 @@ ID          : [a-zA-Z_] [a-zA-Z_0-9]* ;
 CHAR        : '\'' . '\'' ;
 INTEGER     : '0' | [1-9] [0-9]* ;
 UINT        : INTEGER 'u' ;
-FLOAT       : [0-9]+ '.' [0-9]* ('e' [+-]? [0-9]+)? 'f' ;
-REAL        : [0-9]+ '.' [0-9]* ('e' [+-]? [0-9]+)? ;
+FLOAT       : [0-9]+ '.' [0-9]* ([eE] [+-]? [0-9]+)? [fF] ;
+REAL        : [0-9]+ '.' [0-9]* ([eE] [+-]? [0-9]+)? ;
 USHORT      : INTEGER 'us' ;
 SHORT       : INTEGER 's' ;
 
