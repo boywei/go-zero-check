@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"github.com/boywei/go-zero-check/internal/middleware"
 	"net/http"
 	"runtime/debug"
 
@@ -18,6 +19,7 @@ func Router() *gin.Engine {
 	r.NoRoute(HandleNotFound)
 	r.NoMethod(HandleNotFound)
 	r.Use(Recover)
+	r.Use(middleware.Cors())
 
 	// Swagger 配置
 	docs.SwaggerInfo.BasePath = "/"

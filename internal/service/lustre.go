@@ -38,9 +38,21 @@ func ConvertStateMachine(file string) (string, error) {
 	if !strings.Contains(file, "automaton") {
 		return "", errors.New("当前模型中未找到状态机!")
 	}
+	// case-nuclear: 核电场景
+	if strings.Contains(file, "Nuclear") {
+		return define.NuclearResult, nil
+	}
+	// case-driving:
+	if strings.Contains(file, "Car") {
+		return define.CarResult, nil
+	}
 	// example1: automaton SM1 视频状态机的案例
 	if strings.Contains(file, "SM1") {
 		return define.StmResult, nil
+	}
+	// example2: SM2代表反例
+	if strings.Contains(file, "SM2") {
+		return "", errors.New("状态机存在语法错误!")
 	}
 	// 默认情况
 	return file, nil

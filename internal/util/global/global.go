@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/rand"
 	"os"
+	"time"
 )
 
 type Model struct {
@@ -59,7 +60,15 @@ func (model *Model) Check(property string) (string, error) {
 		return result, nil
 	}
 	// TODO: 检查性质是否成立
-	a, b := rand.Float64(), rand.Float64()
+	rand.Seed(time.Now().UnixNano())
+
+	a := rand.Float64()
+
+	minBound := math.Max(0, a-0.1)
+	maxBound := math.Min(1, a+0.1)
+	b := minBound + rand.Float64()*(maxBound-minBound)
+
+	// 计算min和max
 	min, max := math.Min(a, b), math.Max(a, b)
 	result := fmt.Sprintf("[%f, %f]", min, max)
 	propertyResultMap[model.Name+property] = result
