@@ -26,10 +26,12 @@ func CheckDataflow(file string) (string, error) {
 		return "", errors.Wrapf(err, "数据流验证错误: %v", err)
 	}
 	body, _ := io.ReadAll(resp.Body)
+	escapedBody := strings.ReplaceAll(string(body), "\\n", "\n")
+
 	if resp.StatusCode != http.StatusOK {
-		return "", errors.New("验证出错: " + resp.Status + ", 错误信息: " + string(body))
+		return "", errors.New("验证出错: " + resp.Status + ", 错误信息: " + escapedBody)
 	}
-	return string(body), nil
+	return escapedBody, nil
 }
 
 // ConvertStateMachine 状态机转换
