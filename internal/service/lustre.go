@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/boywei/go-zero-check/internal/define"
+	"github.com/boywei/go-zero-check/internal/synlong"
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
@@ -11,33 +12,40 @@ import (
 )
 
 const (
-	kind2Url    = "http://localhost:8081/synlong/check"
+	kind2Url    = "http://localhost:8099/lustre/check"
 	contentType = "application/json"
 )
 
 // CheckDataflow 验证数据流
 func CheckDataflow(file string) (string, error) {
-	// TODO: 调用熊江的kind2验证接口
 	data := make(map[string]interface{})
-	data["selectedSolver"] = "Z3"
-	data["code"] = file
+	data["file"] = file
 	bytesData, _ := json.Marshal(data)
 	resp, err := http.Post(kind2Url, contentType, bytes.NewReader(bytesData))
 	if err != nil {
 		return "", errors.Wrapf(err, "数据流验证错误: %v", err)
 	}
 	body, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.New("验证出错: " + resp.Status + ", 错误信息: " + string(body))
+	}
 	return string(body), nil
 }
 
 // ConvertStateMachine 状态机转换
 func ConvertStateMachine(file string) (string, error) {
 	// TODO: 解析SynLong -> JSON
-	// 出bug了, 以下写死
-	// example0: 语法错误或不含状态机
-	if !strings.Contains(file, "automaton") {
-		return "", errors.New("当前模型中未找到状态机!")
+	result, err := synlong.CheckSynLong(file)
+	if err != nil {
+		return "", errors.Wrap(err, "未能识别语法!")
 	}
+
+	// 不含状态机, 则直接使用数据流验证
+	if !strings.Contains(file, "automaton") {
+		return CheckDataflow(file)
+	}
+
+	// 出bug了, 以下写死
 	// case-nuclear: 核电场景
 	if strings.Contains(file, "Nuclear") {
 		return define.NuclearResult, nil
@@ -55,5 +63,5 @@ func ConvertStateMachine(file string) (string, error) {
 		return "", errors.New("状态机存在语法错误!")
 	}
 	// 默认情况
-	return file, nil
+	return result, nil
 }

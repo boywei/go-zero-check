@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/boywei/go-zero-check/internal/model"
-	"github.com/boywei/go-zero-check/internal/util/cmd"
 	"github.com/boywei/go-zero-check/internal/util/global"
 	"github.com/pkg/errors"
 	"github.com/traefik/yaegi/interp"
@@ -22,39 +21,46 @@ func Convert(modelName string, object *model.Uppaal) error {
 			return errors.Wrap(err, "删除旧目录失败")
 		}
 	}
-	if err := os.MkdirAll(modelPath, os.ModePerm); err != nil {
-		return errors.Wrap(err, "生成模型目录失败")
-	}
-
-	// 生成define.go文件
-	src, dest := filepath.Join("demo", "define.txt"), filepath.Join(modelPath, "define.go")
-	if err := copyFile(src, dest, modelName); err != nil {
-		return errors.Wrap(err, "生成define.go文件失败")
-	}
-
-	// 生成declaration.go文件
-	if err := generateDeclarationFile(modelPath, modelName, object.Declaration); err != nil {
-		return errors.Wrap(err, "生成declaration.go文件失败")
-	}
-
-	// 生成<automaton>.go文件
-	for _, automaton := range object.Automatons {
-		if err := generateAutomatonFile(modelPath, modelName, automaton); err != nil {
-			return errors.Wrap(err, "生成<automaton>.go文件失败")
-		}
-	}
-
 	// 保存模型, 添加到全局变量中, 生成模型的解释器
 	global.ModelIdMap[modelName] = &global.Model{
 		Name:        modelName,
 		Path:        modelPath,
 		Interpreter: interp.New(interp.Options{}),
 	}
-
-	// 运行模型
-	if _, err := cmd.RunStaticCode(modelName); err != nil {
-		return errors.Wrap(err, "运行模型失败")
-	}
+	// TODO: 这里是要改回来的
+	//if err := os.MkdirAll(modelPath, os.ModePerm); err != nil {
+	//	return errors.Wrap(err, "生成模型目录失败")
+	//}
+	//
+	//// 生成define.go文件
+	//src, dest := filepath.Join("demo", "define.txt"), filepath.Join(modelPath, "define.go")
+	//if err := copyFile(src, dest, modelName); err != nil {
+	//	return errors.Wrap(err, "生成define.go文件失败")
+	//}
+	//
+	//// 生成declaration.go文件
+	//if err := generateDeclarationFile(modelPath, modelName, object.Declaration); err != nil {
+	//	return errors.Wrap(err, "生成declaration.go文件失败")
+	//}
+	//
+	//// 生成<automaton>.go文件
+	//for _, automaton := range object.Automatons {
+	//	if err := generateAutomatonFile(modelPath, modelName, automaton); err != nil {
+	//		return errors.Wrap(err, "生成<automaton>.go文件失败")
+	//	}
+	//}
+	//
+	//// 保存模型, 添加到全局变量中, 生成模型的解释器
+	//global.ModelIdMap[modelName] = &global.Model{
+	//	Name:        modelName,
+	//	Path:        modelPath,
+	//	Interpreter: interp.New(interp.Options{}),
+	//}
+	//
+	//// 运行模型
+	//if _, err := cmd.RunStaticCode(modelName); err != nil {
+	//	return errors.Wrap(err, "运行模型失败")
+	//}
 
 	return nil
 }
