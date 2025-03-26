@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	kind2Url    = "http://localhost:8099/lustre/check"
+	kind2Url    = "http://localhost:8099/lustre/check-java"
 	contentType = "application/json"
 )
 
@@ -23,13 +23,13 @@ func CheckDataflow(file string) (string, error) {
 	bytesData, _ := json.Marshal(data)
 	resp, err := http.Post(kind2Url, contentType, bytes.NewReader(bytesData))
 	if err != nil {
-		return "", errors.Wrapf(err, "数据流验证错误: %v", err)
+		return "", err
 	}
 	body, _ := io.ReadAll(resp.Body)
 	escapedBody := strings.ReplaceAll(string(body), "\\n", "\n")
 
 	if resp.StatusCode != http.StatusOK {
-		return "", errors.New("验证出错: " + resp.Status + ", 错误信息: " + escapedBody)
+		return "", errors.New(escapedBody)
 	}
 	return escapedBody, nil
 }

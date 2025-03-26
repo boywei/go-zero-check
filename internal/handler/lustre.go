@@ -24,7 +24,7 @@ func ConvertLustre(c *gin.Context) {
 	}
 	result, err := service.ConvertStateMachine(file)
 	if err != nil {
-		response.ServiceError(c, "状态机转化错误: "+err.Error())
+		response.ServiceError(c, "状态机转化错误: " + err.Error())
 		return
 	}
 	response.Success(c, gin.H{
