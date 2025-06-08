@@ -35,7 +35,7 @@ func Router() *gin.Engine {
 	// lustre
 	lustre := r.Group("/lustre")
 	{
-		lustre.POST("/convert", handler.ConvertLustre)
+		lustre.POST("/check", handler.ConvertLustre)
 		lustre.POST("/check-dataflow", handler.CheckDataflow)
 	}
 

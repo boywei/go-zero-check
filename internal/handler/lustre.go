@@ -13,7 +13,7 @@ import (
 //	@Param		file	body	string	true	"file content"
 //	@Produce	json
 //	@Success	200	{object}	response.Response
-//	@Router		/lustre/convert [post]
+//	@Router		/lustre/check [post]
 func ConvertLustre(c *gin.Context) {
 	content := make(map[string]string)
 	c.BindJSON(&content)
@@ -24,11 +24,11 @@ func ConvertLustre(c *gin.Context) {
 	}
 	result, err := service.ConvertStateMachine(file)
 	if err != nil {
-		response.ServiceError(c, "状态机转化错误: " + err.Error())
+		response.ServiceError(c, "解析错误: "+err.Error())
 		return
 	}
 	response.Success(c, gin.H{
-		"jsonModel": result,
+		"result": result,
 	})
 }
 
